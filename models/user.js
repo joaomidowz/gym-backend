@@ -30,6 +30,29 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    height_cm: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: 100,
+        max: 250
+      }
+    },
+    weight_kg: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      validate: {
+        min: 30,
+        max: 350
+      }
+    },
+    streak_count: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: 0
+      }
+    },
   }, {
     sequelize,
     modelName: 'User',

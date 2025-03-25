@@ -21,6 +21,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      height_cm: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      weight_kg: {
+        type: Sequelize.FLOAT,
+        allowNull: true
+      },
+      streak_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -32,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

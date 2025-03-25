@@ -22,3 +22,6 @@ config/config.json
 # Sistema
 .DS_Store
 Thumbs.db
+
+script.md
+plano.md

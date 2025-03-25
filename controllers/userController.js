@@ -6,7 +6,7 @@ const secret = process.env.JWT_SECRET || 'segredo_segurao';
 
 //create user
 const createUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, height_cm, weight_kg } = req.body;
 
     try {
         const hash = await bcrypt.hash(password, 10)
@@ -15,11 +15,21 @@ const createUser = async (req, res) => {
             name,
             email,
             password: hash,
+            height_cm,
+            weight_kg
         })
 
-        res.status(201).json({ id: user.id, name: user.name, email: user.email });
+        res.status(201).json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            height_cm: user.height_cm,
+            weight_kg: user.weight_kg,
+            streak_count: user.streak_count
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Error to create user' });
+        console.error('Create user error:', error);
+        return res.status(500).json({ error: error.message });
     }
 }
 
@@ -33,7 +43,7 @@ const login = async (req, res) => {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(401).json({ error: 'Incorrect password' })
 
-        const token = jwt.sign({ id: user.id, email: email.user, }, secret, { expiresIn: '1d' })
+        const token = jwt.sign({ id: user.id, email: user.email, }, secret, { expiresIn: '1d' })
 
         res.json({ token })
     } catch (error) {
@@ -44,7 +54,7 @@ const login = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll({ attributes: ['id', 'name', 'email' ]})
+        const users = await User.findAll({ attributes: ['id', 'name', 'email', 'height_cm', 'weight_kg', 'streak_count'] })
         res.json(users)
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -55,4 +65,4 @@ module.exports = {
     createUser,
     login,
     getAllUsers
-  };
+};
