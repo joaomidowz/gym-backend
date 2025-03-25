@@ -2,6 +2,7 @@ const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { where } = require('sequelize');
+const secret = process.env.JWT_SECRET || 'segredo_segurao';
 
 //create user
 const createUser = async (req, res) => {
@@ -26,7 +27,7 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOnde({ where: { email } })
+        const user = await User.findOne({ where: { email } })
         if (!user) return res.status(404).json({ error: 'User not find' })
 
         const match = await bcrypt.compare(password, user.password)
@@ -36,6 +37,22 @@ const login = async (req, res) => {
 
         res.json({ token })
     } catch (error) {
-        res.status(500).json({ error: 'Error in login'})
+        console.error('Login error:', error);
+        res.status(500).json({ error: error.message });
     }
 }
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll({ attributes: ['id', 'name', 'email' ]})
+        res.json(users)
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = {
+    createUser,
+    login,
+    getAllUsers
+  };

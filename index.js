@@ -1,5 +1,6 @@
 const express = require('express')
-const { sequelize, User } = require('./models');
+const { sequelize } = require('./models');
+const userRoutes = require('./routes/userRoutes')
 const app = express()
 const PORT = 3001;
 
@@ -11,29 +12,13 @@ app.get('/', (req, res) => {
     res.send('API Gym App is running');
 });
 
-// Create user
-app.post('/user', async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
+// Routes
+app.get('/', (req, res) => res.send('API Gym App is running'));
 
-        const user = await User.create({ name, email, password });
-        res.status(201).json(user)
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-})
+// Routes -> User
+app.use('/user', userRoutes)
 
-// List user
-app.get('/user', async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users)
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-})
-
-// 
+// Initiate
 app.listen(PORT, async () => {
     try {
         await sequelize.authenticate();
