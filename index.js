@@ -23,7 +23,7 @@ app.post('/user', async (req, res) => {
     }
 })
 
-// Create user
+// List user
 app.get('/user', async (req, res) => {
     try {
         const users = await User.findAll();
@@ -33,7 +33,7 @@ app.get('/user', async (req, res) => {
     }
 })
 
-// Create user
+// 
 app.listen(PORT, async () => {
     try {
         await sequelize.authenticate();
