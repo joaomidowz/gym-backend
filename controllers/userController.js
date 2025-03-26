@@ -1,8 +1,7 @@
 const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { where } = require('sequelize');
-const secret = process.env.JWT_SECRET || 'segredo_segurao';
+const secret = process.env.JWT_SECRET;
 
 //create user
 const createUser = async (req, res) => {
@@ -43,7 +42,7 @@ const login = async (req, res) => {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(401).json({ error: 'Incorrect password' })
 
-        const token = jwt.sign({ id: user.id, email: user.email, }, secret, { expiresIn: '1d' })
+        const token = jwt.sign({ id: user.id, email: user.email, }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
         res.json({ token })
     } catch (error) {
