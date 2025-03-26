@@ -6,12 +6,13 @@ module.exports = {
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
     dialect: 'postgres',
   },
   production: {
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
+    logging: false,
     dialectOptions: {
       ssl: {
         require: true,
