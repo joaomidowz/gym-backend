@@ -2,6 +2,7 @@ const express = require('express')
 const { sequelize } = require('./models');
 const userRoutes = require('./routes/userRoutes')
 const exerciseRoutes = require('./routes/exerciseRoute')
+const workoutSessionRoutes = require('./routes/workoutSessionRoutes')
 const app = express()
 const PORT = 3001;
 
@@ -14,6 +15,7 @@ app.get('/', (req, res) => res.send('API Gym App is running'));
 // Routes 
 app.use('/user', userRoutes)
 app.use('/exercises', exerciseRoutes)
+app.use('/workout-session', workoutSessionRoutes)
 
 // Initiate
 app.listen(PORT, async () => {
