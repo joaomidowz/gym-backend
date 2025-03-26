@@ -1,22 +1,19 @@
 const express = require('express')
 const { sequelize } = require('./models');
 const userRoutes = require('./routes/userRoutes')
+const exerciseRoutes = require('./routes/exerciseRoute')
 const app = express()
 const PORT = 3001;
 
 // Middlewares
 app.use(express.json());
 
-// Fast test
-app.get('/', (req, res) => {
-    res.send('API Gym App is running');
-});
-
-// Routes
+// Fast Test
 app.get('/', (req, res) => res.send('API Gym App is running'));
 
-// Routes -> User
+// Routes 
 app.use('/user', userRoutes)
+app.use('/exercises', exerciseRoutes)
 
 // Initiate
 app.listen(PORT, async () => {

@@ -14,12 +14,25 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Exercises.init({
-    name: DataTypes.STRING,
-    category: DataTypes.STRING,
-    thumbUrl: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false
+
+    },
+    thumbUrl: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
   }, {
     sequelize,
     modelName: 'Exercises',
+    tableName: 'exercises'
   });
   return Exercises;
+
 };
