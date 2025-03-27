@@ -10,6 +10,7 @@ router.post('/register', userController.createUser)
 router.post('/login', userController.login)
 
 // PRIVATE ROUTE
+router.get('/me', authMiddleware, userController.getLoggedUser);
 router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUserById)
 
 // PROTECTED ROUTES

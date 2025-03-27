@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'workoutSession'
       })
 
-      this.belongsTo(models.Exercises, {
+      this.belongsTo(models.Exercise, {
         foreignKey: 'exercise_id',
         as: 'exercise'
       })

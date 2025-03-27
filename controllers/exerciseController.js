@@ -1,10 +1,10 @@
 const { ValidationErrorItemType } = require("sequelize")
-const { Exercises } = require("../models")
+const { Exercise } = require("../models")
 
 // GET /exercises
 const getAllExercise = async (req, res) => {
     try {
-        const exercises = await Exercises.findAll()
+        const exercises = await Exercise.findAll()
         res.json(exercises)
     } catch (error) {
         console.error('Get exercises error: ', error)
@@ -19,7 +19,7 @@ const createExercise = async (req, res) => {
     if (!name || !category) return res.status(400).json({ error: 'Mandatory filters is missing.' })
 
     try {
-        const exercises = await Exercises.create({ name, category, thumbUrl })
+        const exercises = await Exercise.create({ name, category, thumbUrl })
         res.status(201).json(exercises)
     } catch (error) {
         console.error('Create exercises error: ', error)
@@ -35,7 +35,7 @@ const alterExercise = async (req, res) => {
     if (!name || !category) return res.status(400).json({ error: 'Mandatory filters is missing.' })
 
     try {
-        const exercises = await Exercises.findByPk(id)
+        const exercises = await Exercise.findByPk(id)
 
         if (!exercises) return res.status(400).json({ error: 'Exercise not find' })
 
@@ -57,7 +57,7 @@ const deleteExercise = async (req, res) => {
     const { id } = req.params
 
     try {
-        const exercises = await Exercises.findByPk(id)
+        const exercises = await Exercise.findByPk(id)
 
         if (!exercises) return res.status(400).json({ error: 'Exercise not find' })
 

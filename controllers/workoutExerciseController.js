@@ -1,10 +1,10 @@
-const { WorkoutExercise, Exercises } = require('../models')
+const { WorkoutExercise, Exercise } = require('../models')
 
 // GET /workout-exercise
 const getAllWorkoutExercises = async (req, res) => {
     try {
         const exercises = await WorkoutExercise.findAll({
-            include: [{ model: Exercises, as: 'exercise' }]
+            include: [{ model: Exercise, as: 'exercise' }]
         })
         res.json(exercises)
     } catch (error) {
@@ -43,7 +43,7 @@ const getWorkoutExerciseByWorkoutId = async (req, res) => {
     try {
         const exercises = await WorkoutExercise.findAll({
             where: { workout_id: id },
-            include: [{ model: Exercises, as: 'exercise' }]
+            include: [{ model: Exercise, as: 'exercise' }]
         })
 
         if (!exercises.length) return res.status(404).json({ message: 'No exercises found for this workout session.' })

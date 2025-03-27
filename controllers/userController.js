@@ -43,6 +43,18 @@ const createUser = async (req, res) => {
     }
 }
 
+const getLoggedUser = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id, {
+            attributes: { exclude: ['password'] }
+        })
+
+        res.status(200).json(user)
+    } catch (error) {
+        return res.status(500).json({ error: 'Error fetching logged user.' });
+    }
+}
+
 const login = async (req, res) => {
     const { email, password } = req.body;
 
@@ -146,6 +158,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     createUser,
     login,
+    getLoggedUser,
     getAllUsers,
     getUserById,
     updateUser,

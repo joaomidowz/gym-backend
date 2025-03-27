@@ -27,6 +27,6 @@ app.listen(PORT, async () => {
         console.log('🟢 connection is successful')
         console.log(`🚀 Server running in: http://localhost:${PORT}`);
     } catch (error) {
-        rconsole.log('🔴 connection error', error)
+        console.log('🔴 connection error', error)
     }
 })
