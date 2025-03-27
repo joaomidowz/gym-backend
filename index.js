@@ -4,6 +4,7 @@ const userRoutes = require('./routes/userRoutes')
 const exerciseRoutes = require('./routes/exerciseRoutes')
 const workoutSessionRoutes = require('./routes/workoutSessionRoutes')
 const workoutExercisesRoutes = require('./routes/workoutExerciseRoutes')
+const likeRoutes = require('./routes/likeRoutes')
 
 const app = express()
 const PORT = 3001;
@@ -19,6 +20,7 @@ app.use('/user', userRoutes)
 app.use('/exercises', exerciseRoutes)
 app.use('/workout-session', workoutSessionRoutes)
 app.use('/workout-exercise', workoutExercisesRoutes)
+app.use('/likes', likeRoutes)
 
 // Initiate
 app.listen(PORT, async () => {

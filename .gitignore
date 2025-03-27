@@ -12,10 +12,6 @@ npm-debug.log*
 # Sequelize
 config/config.json
 
-# Banco local (caso crie um SQLite por engano)
-*.sqlite
-*.sqlite3
-
 # VSCode
 .vscode/
 
