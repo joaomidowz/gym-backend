@@ -31,7 +31,7 @@ const isSessionOwnerOrAdmin = async (req, res, next) => {
     }
 }
 
-const { WorkoutExercise, WorkoutSession } = require('../models')
+const { WorkoutExercise } = require('../models')
 
 const isWorkoutExerciseOwnerOrAdmin = async (req, res, next) => {
     const exerciseId = parseInt(req.params.id)
