@@ -3,6 +3,7 @@ const router = express.Router()
 const workoutSessionController= require('../controllers/workoutSessionController')
 const authMiddleware = require('../middlewares/authMiddleware')
 const { checkSessionVisibility } = require('../middlewares/visibilityMiddleware')
+const { isSessionOwnerOrAdmin } = require('../middlewares/ownershipMiddleware')
 
 // GET 
 router.get('/', authMiddleware, workoutSessionController.getAllSessions)
@@ -17,9 +18,9 @@ router.get('/:id', authMiddleware, checkSessionVisibility, workoutSessionControl
 router.post('/', authMiddleware, workoutSessionController.createSession)
 
 //PUT
-router.put('/:id', authMiddleware, workoutSessionController.updateSession)
+router.put('/:id', authMiddleware, isSessionOwnerOrAdmin, workoutSessionController.updateSession)
 
 //DELETE
-router.delete('/:id', authMiddleware, workoutSessionController.deleteSession)
+router.delete('/:id', authMiddleware, isSessionOwnerOrAdmin, workoutSessionController.deleteSession)
 
 module.exports = router

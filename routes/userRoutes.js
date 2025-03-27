@@ -3,6 +3,7 @@ const router = express.Router()
 const userController = require('../controllers/userController')
 const authMiddleware = require('../middlewares/authMiddleware')
 const { checkProfileVisibility } = require('../middlewares/visibilityMiddleware');
+const { isUserOwnerOrAdmin } = require('../middlewares/ownershipMiddleware');
 
 // PUBLIC ROUTES
 router.post('/register', userController.createUser)
@@ -13,7 +14,7 @@ router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUse
 
 // PROTECTED ROUTES
 router.get('/', authMiddleware, userController.getAllUsers)
-router.put('/:id', authMiddleware, userController.updateUser)
-router.delete('/:id', authMiddleware, userController.deleteUser)
+router.put('/:id', authMiddleware, isUserOwnerOrAdmin, userController.updateUser)
+router.delete('/:id', authMiddleware, isUserOwnerOrAdmin, userController.deleteUser)
 
 module.exports = router;
