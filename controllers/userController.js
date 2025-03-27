@@ -18,13 +18,24 @@ const createUser = async (req, res) => {
             weight_kg
         })
 
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
         res.status(201).json({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            height_cm: user.height_cm,
-            weight_kg: user.weight_kg,
-            streak_count: user.streak_count
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                height_cm: user.height_cm,
+                weight_kg: user.weight_kg,
+                streak_count: user.streak_count,
+                is_admin: user.is_admin,
+                is_public: user.is_public
+            }
         });
     } catch (error) {
         console.error('Create user error:', error);
@@ -44,7 +55,16 @@ const login = async (req, res) => {
 
         const token = jwt.sign({ id: user.id, email: user.email, }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
-        res.json({ token })
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                is_admin: user.is_admin,
+                is_public: user.is_public
+            }
+        });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: error.message });
@@ -60,17 +80,26 @@ const getAllUsers = async (req, res) => {
     }
 }
 
+// GET /USER:ID
+const getUserById = async (req, res) => {
+    try {
+        return res.status(200).json(req.profile)
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 // PUT / user
 const updateUser = async (req, res) => {
     const { id } = req.params
     const { height_cm, weight_kg } = req.body
 
-    if (!height_cm && !weight_kg) return res.status(400).json({ error: 'At least one field (height our weight must be provide' })
+    if (!height_cm && !weight_kg) return res.status(400).json({ error: 'At least one field (height our weight) must be provide' })
 
     try {
-        const user = await user.findByPk(id)
+        const user = await User.findByPk(id)
 
-        if (!user) return res.status(400).json({ error: 'User not Found' })
+        if (!user) return res.status(404).json({ error: 'User not Found' })
 
         if (height_cm !== undefined) user.height_cm = height_cm
         if (weight_kg !== undefined) user.weight_kg = weight_kg
@@ -91,7 +120,7 @@ const updateUser = async (req, res) => {
 
     } catch (error) {
         console.error('Update user error:', error)
-        res.status(500).json({ error: error.message})
+        res.status(500).json({ error: error.message })
     }
 }
 
@@ -106,7 +135,7 @@ const deleteUser = async (req, res) => {
 
         await user.destroy()
 
-        res.json({ message: 'User deleted successfully'})
+        res.json({ message: 'User deleted successfully' })
     } catch (error) {
         console.error('Delete user error: ', error)
         res.status(500).json({ error: error.message })
@@ -118,6 +147,7 @@ module.exports = {
     createUser,
     login,
     getAllUsers,
+    getUserById,
     updateUser,
     deleteUser
 };

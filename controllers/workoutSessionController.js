@@ -43,9 +43,19 @@ const getSessionByUser = async (req, res) => {
     }
 }
 
+const getSessionById = async (req, res) => {
+    try {
+      const session = req.session;
+  
+      return res.status(200).json(session);
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+  };
+
 // PUT /workout-session/:id
 const updateSession = async (req, res) => {
-    const { id } = req.body
+    const { id } = req.params
     const { date } = req.body
 
     if (!date) return res.status(400).json({ error: 'The field date must be provide' })
@@ -58,7 +68,7 @@ const updateSession = async (req, res) => {
 
         await sessions.save()
 
-        res.json({ message: 'Workout session update successfuly', sessions })
+        res.json({ message: 'Workout session update successfuly', sessions: sessions })
     } catch (error) {
         console.error('Update sessions error:', error)
         res.status(500).json({ error: error.message })
@@ -86,6 +96,7 @@ module.exports = {
     getAllSessions,
     createSession,
     getSessionByUser,
+    getSessionById,
     updateSession,
     deleteSession
 };
