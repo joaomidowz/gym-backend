@@ -7,6 +7,7 @@ const workoutExercisesRoutes = require('./routes/workoutExerciseRoutes')
 const likeRoutes = require('./routes/likeRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const feedRoutes = require('./routes/feedRoutes')
+const followRoutes = require('./routes/followRoutes')
 
 const app = express()
 const PORT = 3001;
@@ -19,6 +20,7 @@ app.get('/', (req, res) => res.send('API Gym App is running'));
 
 // Routes 
 app.use('/user', userRoutes)
+app.use('/follow', followRoutes)
 app.use('/exercises', exerciseRoutes)
 app.use('/workout-session', workoutSessionRoutes)
 app.use('/workout-exercise', workoutExercisesRoutes)
