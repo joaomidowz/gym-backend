@@ -9,6 +9,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       WorkoutSession.belongsTo(models.User, {
         foreignKey: 'user_id',
+        as: 'likes'
+      })
+
+      WorkoutSession.hasMany(models.Like, {
+        foreignKey: 'session_id',
+        as: 'comments'
+      })
+
+      WorkoutSession.hasMany(models.Comment, {
+        foreignKey: 'session_id',
         as: 'user'
       })
     }
@@ -17,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'No title'
     },
     is_public: {
       type: DataTypes.BOOLEAN,
