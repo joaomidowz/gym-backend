@@ -1,6 +1,6 @@
 # 🏋️ Gym App - Backend
 
-Este é o backend da aplicação **Gym App**, feita para gerenciar usuários, treinos, streaks e agora também **ações sociais como curtidas, comentários e feed**.  
+Este é o backend da aplicação **Gym App**, feita para gerenciar usuários, treinos, execuções, e agora também **ações sociais como curtidas, comentários, feed e seguidores**.  
 Ideal pra quem quer manter o foco nos treinos e ainda socializar com a galera da maromba digital 💪🔥
 
 ---
@@ -8,15 +8,15 @@ Ideal pra quem quer manter o foco nos treinos e ainda socializar com a galera da
 ## 🔧 Tecnologias utilizadas
 
 - Node.js + Express
-- Sequelize (ORM)
-- PostgreSQL (Railway)
-- JWT + Bcrypt (Auth segura)
-- Sequelize CLI
-- Dotenv
+- Sequelize ORM
+- PostgreSQL (Railway ou local)
+- JWT + Bcrypt para autenticação segura
+- Sequelize CLI para migrations
+- Dotenv para variáveis de ambiente
 
 ---
 
-## 🌐 Variáveis de Ambiente (produção)
+## 🌐 Variáveis de Ambiente
 
 ```env
 DB_USER=
@@ -26,120 +26,143 @@ DB_HOST=
 DB_PORT=
 JWT_SECRET=
 ```
-
-Ou use `DATABASE_URL` para produção.
-
----
-
 ## 🧠 Funcionalidades
 
 ### 🔐 Autenticação
-
-- Registro e login com hash seguro
-- JWT na resposta e verificação via middleware
-- Auto-login ao se registrar
+- Registro e login com hash seguro (bcrypt)
+- JWT gerado e validado em cada rota protegida
+- Middleware `authMiddleware` ativo
 - Rota `GET /user/me` para pegar perfil logado
 
 ---
 
 ### 👤 Usuários
-
-- CRUD completo com `is_admin` e `is_public`
-- Rota protegida para atualização e deleção
-- Middlewares: `authMiddleware`, `isUserOwnerOrAdmin`
+- CRUD completo com campos `is_admin` e `is_public`
+- Atualização e deleção protegida
+- Middleware `isUserOwnerOrAdmin` e verificação de perfil público
 
 ---
 
 ### 🏋️ Exercícios
-
-- CRUD de exercícios
-- Exercícios globais (`is_global: true`)
-- Proteções: só o dono ou admin pode editar/deletar
+- CRUD completo de exercícios
+- Campos `is_global` e `user_id`
+- Proteção: apenas o criador ou admin pode editar/deletar
+- Exercícios globais ou já usados não podem ser alterados
 
 ---
 
-### 📅 Sessões de treino
-
+### 📅 Sessões de treino (`WorkoutSession`)
 - Campos: `title`, `date`, `is_public`
-- CRUD completo
-- Apenas o dono ou admin pode alterar/deletar
-- Dashboard do usuário logado: `GET /workout-session`
+- CRUD completo vinculado ao usuário
+- Proteção: somente dono ou admin pode editar/deletar
+- Middleware `isSessionOwnerOrAdmin` e `checkSessionVisibility`
 
 ---
 
-### 🏋️‍♀️ Execuções de treino
+### 🏋️‍♀️ Execuções (`WorkoutExercise`)
+- Cada execução representa um exercício dentro de uma sessão
+- Campos: `exercise_id`, `weight`, `reps`, `sets`, `notes`
+- Middleware `isWorkoutExerciseOwnerOrAdmin`
+- Resumo automático atualizado com base nos `WorkoutSet`
 
-- Vincula exercícios às sessões de treino
-- Proteções ativas: apenas dono ou admin pode modificar
+---
+
+### 🔂 Séries (`WorkoutSet`)
+- Série individual (set) de um exercício
+- Campos: `set_type`, `weight`, `reps`, `order`
+- CRUD completo: criar, listar, atualizar e remover
+- Proteção com `isSetOwnerOrAdmin` (dono da sessão ou admin)
+- Atualiza automaticamente o resumo (`sets`, `reps`, `weight`) na `WorkoutExercise`
 
 ---
 
 ### ❤️ Likes
-
-- `POST /likes` para curtir
+- `POST /likes` para curtir sessões públicas
 - `DELETE /likes/:id` para descurtir
-- Apenas o autor ou admin pode descurtir
-- Válido apenas para sessões públicas
+- Protegido: apenas o autor do like ou admin pode deletar
 
 ---
 
 ### 💬 Comentários
-
-- `POST /comments` para comentar sessão pública
-- `GET /comments/:sessionId` para listar comentários
-- `DELETE /comments/:id` apenas pelo autor ou admin
+- `POST /comments` para comentar sessões públicas
+- `GET /comments/:sessionId` para listar todos os comentários
+- `DELETE /comments/:id` com middleware `isCommentOwner`
 
 ---
 
-### 📰 Feed
+### 📰 Feed Social
+- Rota `GET /feed`
+- Lista sessões públicas ordenadas por data (mais recentes primeiro)
+- Inclui:
+  - Dados do dono da sessão
+  - Total de likes
+  - Comentários (com autor)
+- Suporta paginação: `?limit=10&offset=0`
 
-- Rota: `GET /feed`
-- Retorna sessões públicas com:
-  - Usuário dono da sessão
-  - Quantidade de likes
-  - Comentários (com nome de quem comentou)
-- Suporta paginação com `?limit=10&offset=0`
+---
 
+### 👥 Seguidores
+- `POST /follow/:id` para seguir um usuário
+- `DELETE /follow/:id` para deixar de seguir
+- Middleware `isFollowOwner` protege as ações
 
-## 📁 Estrutura de Pastas
+### 📁 Estrutura de Pastas
 
 ```bash
 backend/
 ├── config/
-│   └── config.js                 # Configuração do Sequelize com suporte a .env
-├── controllers/                 # Lógica de cada rota (CRUDs)
+│   └── config.js
+├── controllers/
+│   ├── commentController.js
 │   ├── exerciseController.js
+│   ├── followController.js
+│   ├── likeController.js
 │   ├── userController.js
 │   ├── workoutExerciseController.js
-│   └── workoutSessionController.js
-├── migrations/                  # Migrations geradas pelo Sequelize CLI
-│   ├── xxxx-create-user.js
-│   ├── xxxx-create-exercises.js
-│   ├── xxxx-create-workout-session.js
-│   └── xxxx-create-workout-exercise.js
-├── models/                      # Models do Sequelize + index.js de boot
-│   ├── exercises.js
-│   ├── index.js
-│   ├── user.js
-│   ├── workoutexercise.js
-│   └── workoutsession.js
-├── routes/                      # Definição das rotas (Express)
+│   ├── workoutSessionController.js
+│   └── workoutSetController.js
+├── routes/
+│   ├── commentRoutes.js
 │   ├── exerciseRoutes.js
+│   ├── feedRoutes.js
+│   ├── followRoutes.js
+│   ├── likeRoutes.js
 │   ├── userRoutes.js
 │   ├── workoutExerciseRoutes.js
-│   └── workoutSessionRoutes.js
-├── seeders/                     # (Vazio) - pode usar no futuro p/ dados fake
-├── .env                         # Variáveis de ambiente (IGNORADO no Git)
-├── .gitignore                   # Ignora node_modules, .env, etc.
-├── index.js                     # Entry point da API (Express)
-├── package.json                 # Dependências e scripts do projeto
-├── package-lock.json
-├── readme.md                    # Documentação do projeto
-├── plano.md                     # Ideias e planejamento
-└── script.md                    # Scripts de uso interno ou anotações
+│   ├── workoutSessionRoutes.js
+│   └── workoutSetRoutes.js
+├── middlewares/
+│   ├── authMiddleware.js
+│   ├── isCommentOwner.js
+│   ├── isFollowOwner.js
+│   ├── isLikeOwner.js
+│   ├── ownershipMiddleware.js
+│   ├── setMiddleware.js
+│   └── visibilityMiddleware.js
+├── migrations/
+├── models/
+│   ├── Comment.js
+│   ├── Exercise.js
+│   ├── Follow.js
+│   ├── index.js
+│   ├── Like.js
+│   ├── User.js
+│   ├── WorkoutExercise.js
+│   ├── WorkoutSession.js
+│   └── WorkoutSet.js
+├── seeders/
+├── .env
+├── .gitignore
+├── index.js
+├── package.json
+├── README.md
+├── plano.md
+└── script.md
 ```
-🚀 Como rodar localmente
 
+## 🚀 Como rodar localmente
+
+```bash
 # Clone o projeto
 git clone https://github.com/seu-usuario/gym-backend.git
 
@@ -149,8 +172,37 @@ cd gym-backend
 # Instale as dependências
 npm install
 
-# Rode as migrations (aplica as tabelas no banco)
+# Configure seu .env com os dados do banco
+
+# Rode as migrations
 npx sequelize-cli db:migrate
 
 # Inicie o servidor
 npx nodemon index.js
+
+---
+
+## 🧱 Status do Backend
+
+| Módulo                   | Status              |
+|--------------------------|---------------------|
+| Autenticação             | ✅ Pronto           |
+| Usuários                 | ✅ Pronto           |
+| Exercícios               | ✅ Pronto           |
+| Sessões                  | ✅ Pronto           |
+| Execuções                | ✅ Pronto           |
+| Séries                   | ✅ Finalizado       |
+| Comentários              | ✅ Pronto           |
+| Likes                    | ✅ Pronto           |
+| Feed                     | ✅ Pronto           |
+| Seguidores               | ✅ Pronto           |
+| Segurança e Middleware   | ✅ Ativo e testado  |
+
+---
+
+## 🧠 Próximos passos (ideias)
+
+- 📊 Histórico de recordes (PRs)
+- 📈 Gráfico de progresso
+- 🔔 Notificações sociais (likes, follows, comentários)
+- 📲 Iniciar frontend (React Native, Next...)

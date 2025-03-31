@@ -12,8 +12,9 @@ module.exports = (sequelize, DataTypes) => {
 
       WorkoutExercise.hasMany(models.WorkoutSet, {
         foreignKey: 'workout_exercise_id',
-        as: 'sets'
+        as: 'workout_sets'
       })
+      
 
       this.belongsTo(models.Exercise, {
         foreignKey: 'exercise_id',
