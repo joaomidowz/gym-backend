@@ -9,17 +9,17 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       WorkoutSession.belongsTo(models.User, {
         foreignKey: 'user_id',
-        as: 'likes'
+        as: 'owner'
       })
 
       WorkoutSession.hasMany(models.Like, {
         foreignKey: 'session_id',
-        as: 'comments'
+        as: 'likes'
       })
 
       WorkoutSession.hasMany(models.Comment, {
         foreignKey: 'session_id',
-        as: 'user'
+        as: 'comments'
       })
 
       WorkoutSession.hasMany(models.WorkoutExercise, {

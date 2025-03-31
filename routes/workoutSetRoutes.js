@@ -8,7 +8,7 @@ const isSetOwnerOrAdmin = require('../middlewares/setMiddleware')
 router.use(authMiddleware)
 
 // POST
-router.post('/', workoutSetController.createSet)
+router.post('/:exerciseId', workoutSetController.createSet)
 
 // GET
 router.get('/exercise/:workoutExerciseId', workoutSetController.getSetsByExercise)

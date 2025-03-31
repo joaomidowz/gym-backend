@@ -58,17 +58,14 @@ const getWorkoutExerciseByWorkoutId = async (req, res) => {
 // PUT /workout-exercise/:id
 const updateWorkoutExercise = async (req, res) => {
     const { id } = req.params
-    const { sets, reps, weight, notes, exercise_id } = req.body
+    const {  notes, exercise_id } = req.body
 
     try {
         const exercise = await WorkoutExercise.findByPk(id)
 
         if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' })
 
-        if (sets !== undefined) exercise.sets = sets;
-        if (exercise_id !== undefined) exercise.exercise_id = exercise_id;
-        if (reps !== undefined) exercise.reps = reps;
-        if (weight !== undefined) exercise.weight = weight;
+        if (exercise_id !== undefined) exercise.exercise_id = exercise_id;;
         if (notes !== undefined) exercise.notes = notes;
 
         await exercise.save()

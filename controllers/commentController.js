@@ -1,7 +1,7 @@
 const { Comment, WorkoutSession } = require('../models')
 
 const postComment = async (req, res) => {
-    const { session_id, text } = req.body
+    const { session_id, content } = req.body
 
     try {
         const session = await WorkoutSession.findByPk(session_id)
@@ -11,7 +11,7 @@ const postComment = async (req, res) => {
         const comment = await Comment.create({
             user_id: req.user.id,
             session_id,
-            content: text
+            content
         })
 
         return res.status(201).json(comment)

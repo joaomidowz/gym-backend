@@ -12,7 +12,7 @@ const getPublicFeed = async (req, res) => {
             include: [
                 {
                     model: User,
-                    as: 'user',
+                    as: 'owner',
                     attributes: ['id', 'name', 'is_public']
                 },
                 {
