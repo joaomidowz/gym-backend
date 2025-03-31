@@ -8,6 +8,7 @@ const likeRoutes = require('./routes/likeRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const feedRoutes = require('./routes/feedRoutes')
 const followRoutes = require('./routes/followRoutes')
+const workoutSetRoutes = require('./routes/workoutSetRoutes')
 
 const app = express()
 const PORT = 3001;
@@ -24,9 +25,11 @@ app.use('/follow', followRoutes)
 app.use('/exercises', exerciseRoutes)
 app.use('/workout-session', workoutSessionRoutes)
 app.use('/workout-exercise', workoutExercisesRoutes)
+app.use('/workout-set', workoutSetRoutes)
 app.use('/likes', likeRoutes)
 app.use('/comments', commentRoutes)
 app.use('/feed', feedRoutes)
+
 
 // Initiate
 app.listen(PORT, async () => {
