@@ -2,12 +2,14 @@ const express = require('express')
 const router = express.Router()
 const followController = require('../controllers/followController')
 const authMiddleware = require('../middlewares/authMiddleware');
+const isFollowOwner = require('../middlewares/isFollowOwner');
+
 
 // FOLLOW
 router.post('/:userId', authMiddleware, followController.followUser)
 
 // UNFOLLOW
-router.delete('/:userId', authMiddleware, followController.unfollowUser)
+router.delete('/:userId', authMiddleware, isFollowOwner, followController.unfollowUser)
 
 // FOLLOWERS
 router.get('/followers/:userId', authMiddleware, followController.getFollowers)
