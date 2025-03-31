@@ -1,34 +1,105 @@
 # 🏋️ Gym App - Backend
 
-Este é o backend da aplicação **Gym App**, feita para gerenciar usuários, treinos, streaks e tudo o que envolve um ambiente de academia moderna 💪
+Este é o backend da aplicação **Gym App**, feita para gerenciar usuários, treinos, streaks e agora também **ações sociais como curtidas, comentários e feed**.  
+Ideal pra quem quer manter o foco nos treinos e ainda socializar com a galera da maromba digital 💪🔥
 
 ---
 
 ## 🔧 Tecnologias utilizadas
 
-- Node.js
-- Express
+- Node.js + Express
 - Sequelize (ORM)
 - PostgreSQL (Railway)
-- Nodemon (dev)
+- JWT + Bcrypt (Auth segura)
 - Sequelize CLI
+- Dotenv
 
 ---
 
 ## 🌐 Variáveis de Ambiente (produção)
 
-Configure essas variáveis no painel do Railway (ou serviço de deploy):
-
-- `DB_USER`
-- `DB_PASS`
-- `DB_NAME`
-- `DB_HOST`
-- `DB_PORT`
-- `JWT_SECRET`
+```env
+DB_USER=
+DB_PASS=
+DB_NAME=
+DB_HOST=
+DB_PORT=
+JWT_SECRET=
+```
 
 Ou use `DATABASE_URL` para produção.
 
 ---
+
+## 🧠 Funcionalidades
+
+### 🔐 Autenticação
+
+- Registro e login com hash seguro
+- JWT na resposta e verificação via middleware
+- Auto-login ao se registrar
+- Rota `GET /user/me` para pegar perfil logado
+
+---
+
+### 👤 Usuários
+
+- CRUD completo com `is_admin` e `is_public`
+- Rota protegida para atualização e deleção
+- Middlewares: `authMiddleware`, `isUserOwnerOrAdmin`
+
+---
+
+### 🏋️ Exercícios
+
+- CRUD de exercícios
+- Exercícios globais (`is_global: true`)
+- Proteções: só o dono ou admin pode editar/deletar
+
+---
+
+### 📅 Sessões de treino
+
+- Campos: `title`, `date`, `is_public`
+- CRUD completo
+- Apenas o dono ou admin pode alterar/deletar
+- Dashboard do usuário logado: `GET /workout-session`
+
+---
+
+### 🏋️‍♀️ Execuções de treino
+
+- Vincula exercícios às sessões de treino
+- Proteções ativas: apenas dono ou admin pode modificar
+
+---
+
+### ❤️ Likes
+
+- `POST /likes` para curtir
+- `DELETE /likes/:id` para descurtir
+- Apenas o autor ou admin pode descurtir
+- Válido apenas para sessões públicas
+
+---
+
+### 💬 Comentários
+
+- `POST /comments` para comentar sessão pública
+- `GET /comments/:sessionId` para listar comentários
+- `DELETE /comments/:id` apenas pelo autor ou admin
+
+---
+
+### 📰 Feed
+
+- Rota: `GET /feed`
+- Retorna sessões públicas com:
+  - Usuário dono da sessão
+  - Quantidade de likes
+  - Comentários (com nome de quem comentou)
+- Suporta paginação com `?limit=10&offset=0`
+
 
 ## 📁 Estrutura de Pastas
 
@@ -68,9 +139,7 @@ backend/
 └── script.md                    # Scripts de uso interno ou anotações
 ```
 🚀 Como rodar localmente
-bash
-Copiar
-Editar
+
 # Clone o projeto
 git clone https://github.com/seu-usuario/gym-backend.git
 
