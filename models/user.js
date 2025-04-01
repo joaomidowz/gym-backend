@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'following_id',
         as: 'followers'
       })
+
+      User.hasOne(models.UserStreak, {
+        foreignKey: 'user_id',
+        as: 'streak'
+      })
     }
   }
   User.init({

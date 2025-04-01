@@ -1,12 +1,13 @@
 const { where } = require('sequelize')
 const { WorkoutSession } = require('../models')
+const { updateUserStreak } = require('../utils/streakUtils');
 
 // GET /workout-session
 const getAllSessions = async function (req, res) {
     try {
         const sessions = await WorkoutSession.findAll({
             where: { user_id: req.user.id },
-            order:  [['date', 'DESC']]
+            order: [['date', 'DESC']]
         })
         res.json(sessions)
     } catch (error) {
@@ -23,7 +24,18 @@ const createSession = async (req, res) => {
 
     try {
         const sessions = await WorkoutSession.create({ user_id: req.user.id, date, is_public, title })
-        res.status(201).json(sessions)
+        const updatedStreak = await updateUserStreak(req.user.id, date);
+
+
+        res.status(201).json({
+            message: 'Workout session created successfuly',
+            sessions,
+            streak: {
+                current_streak: updatedStreak.current_streak,
+                longest_streak: updatedStreak.longest_streak,
+                last_workout_date: updatedStreak.last_workout_date
+            }
+        })
     } catch (error) {
         console.error('Create sessions error:', error)
         res.status(500).json({ error: error.message })
