@@ -67,6 +67,16 @@ JWT_SECRET=
 
 ---
 
+### 🔥 Sistema de Streak (Sequência de Treinos)
+- Rastreia automaticamente os dias consecutivos de treino
+- A streak é reiniciada se o usuário ficar mais de 2 dias sem treinar
+- Se quebrar, o usuário tem 24h para usar um "salve" e manter a streak
+- Rotas:
+  - `GET /user/streak`: visualiza a streak atual
+  - `POST /user/streak/save`: usa o salve se estiver disponível
+
+---
+
 ### 🔂 Séries (`WorkoutSet`)
 - Série individual (set) de um exercício
 - Campos: `set_type`, `weight`, `reps`, `order`
@@ -117,6 +127,7 @@ backend/
 │   ├── exerciseController.js
 │   ├── followController.js
 │   ├── likeController.js
+│   ├── streakController.js      
 │   ├── userController.js
 │   ├── workoutExerciseController.js
 │   ├── workoutSessionController.js
@@ -127,7 +138,7 @@ backend/
 │   ├── feedRoutes.js
 │   ├── followRoutes.js
 │   ├── likeRoutes.js
-│   ├── userRoutes.js
+│   ├── userRoutes.js             
 │   ├── workoutExerciseRoutes.js
 │   ├── workoutSessionRoutes.js
 │   └── workoutSetRoutes.js
@@ -139,7 +150,7 @@ backend/
 │   ├── ownershipMiddleware.js
 │   ├── setMiddleware.js
 │   └── visibilityMiddleware.js
-├── migrations/
+├── migrations/ #
 ├── models/
 │   ├── Comment.js
 │   ├── Exercise.js
@@ -147,9 +158,12 @@ backend/
 │   ├── index.js
 │   ├── Like.js
 │   ├── User.js
+│   ├── UserStreak.js             
 │   ├── WorkoutExercise.js
 │   ├── WorkoutSession.js
 │   └── WorkoutSet.js
+├── utils/
+│   └── streakUtils.js            
 ├── seeders/
 ├── .env
 ├── .gitignore
@@ -194,6 +208,7 @@ npx nodemon index.js
 | Séries                   | ✅ Finalizado       |
 | Comentários              | ✅ Pronto           |
 | Likes                    | ✅ Pronto           |
+| Streak                   | ✅ pronto           |
 | Feed                     | ✅ Pronto           |
 | Seguidores               | ✅ Pronto           |
 | Segurança e Middleware   | ✅ Ativo e testado  |
