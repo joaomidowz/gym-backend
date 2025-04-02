@@ -1,3 +1,4 @@
+import cors from 'cors'
 const express = require('express')
 const { sequelize } = require('./models');
 const userRoutes = require('./routes/userRoutes')
@@ -14,6 +15,14 @@ const app = express()
 const PORT = 3001;
 
 // Middlewares
+// Allowed frontends
+const allowedOrigins = ['http://localhost:3000', 'https://gym-app.vercel.app']
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true // se for trabalhar com cookies no futuro
+  }))
+ 
 app.use(express.json());
 
 // Fast Test
