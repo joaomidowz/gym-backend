@@ -1,5 +1,5 @@
-const { ValidationErrorItemType } = require("sequelize")
 const { Exercise } = require("../models")
+const { Op, where } = require("sequelize")
 
 // GET /exercises
 const getAllExercise = async (req, res) => {
@@ -63,10 +63,32 @@ const deleteExercise = async (req, res) => {
 
         await exercises.destroy()
 
-        res.json({ message: 'Exercise deleted successfully'})
+        res.json({ message: 'Exercise deleted successfully' })
     } catch (error) {
         console.error('Delete exercises error: ', error)
         res.status(500).json({ error: error.message })
+    }
+}
+
+// GET //exercise=query
+const searchExercise = async (req, res) => {
+    const query = req.query.query
+
+    if (!query) return res.status(400).json({ message: "Any Query informed" })
+
+    try {
+        const exercises = await Exercise.findAll({
+            where: {
+                name: {
+                    [Op.iLike]: `%${query}%`
+                },
+            }
+        })
+
+        res.json(exercises)
+    } catch (error) {
+        console.error("Error in search exercises", error)
+        res.status(500).json({ message: "Internal error on search exercises" })
     }
 }
 
@@ -75,5 +97,6 @@ module.exports = {
     getAllExercise,
     createExercise,
     alterExercise,
-    deleteExercise
+    deleteExercise,
+    searchExercise
 }

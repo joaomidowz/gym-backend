@@ -7,6 +7,7 @@ const { isExerciseGlobal, isExerciseInUse, isExerciseOwnerOrAdmin } = require('.
 
 // GET /exercises
 router.get('/', authMiddleware, exerciseController.getAllExercise)
+router.get('/search', authMiddleware, exerciseController.searchExercise)
 
 // POST /exercises
 router.post('/',authMiddleware, exerciseController.createExercise)

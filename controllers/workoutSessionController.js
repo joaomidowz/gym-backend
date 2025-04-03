@@ -1,4 +1,4 @@
-const { where } = require('sequelize')
+const { Op, where } = require("sequelize")
 const { WorkoutSession } = require('../models')
 const { updateUserStreak } = require('../utils/streakUtils');
 
@@ -109,11 +109,34 @@ const deleteSession = async (req, res) => {
     }
 }
 
+// GET //exercise=query
+const searchSession = async (req, res) => {
+    const query = req.query.query
+
+    if (!query) return res.status(400).json({ message: "Any Query informed" })
+
+    try {
+        const session = await WorkoutSession.findAll({
+            where: {
+                title: {
+                    [Op.iLike]: `%${query}%`
+                },
+            }
+        })
+
+        res.json(session)
+    } catch (error) {
+        console.error("Error in search session", error)
+        res.status(500).json({ message: "Internal error on search session" })
+    }
+}
+
 module.exports = {
     getAllSessions,
     createSession,
     getSessionByUser,
     getSessionById,
     updateSession,
-    deleteSession
+    deleteSession,
+    searchSession
 };
