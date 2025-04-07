@@ -36,7 +36,7 @@ const getPublicFeed = async (req, res) => {
           include: [
             {
               model: WorkoutSet,
-              as: 'sets',
+              as: 'workout_sets',
               attributes: ['weight'],
             },
           ],
