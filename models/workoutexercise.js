@@ -5,10 +5,10 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class WorkoutExercise extends Model {
     static associate(models) {
-      this.belongsTo(models.WorkoutSession, {
+      WorkoutExercise.belongsTo(models.WorkoutSession, {
         foreignKey: 'workout_session_id',
         as: 'workout_session'
-      })
+      });
 
       WorkoutExercise.hasMany(models.WorkoutSet, {
         foreignKey: 'workout_exercise_id',
@@ -31,28 +31,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    sets: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: 1
-      }
-    },
-    reps: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: 1
-      }
-    },
-    weight: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    }
   }, {
     sequelize,
     modelName: 'WorkoutExercise',

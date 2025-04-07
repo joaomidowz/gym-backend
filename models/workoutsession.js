@@ -23,9 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       })
 
       WorkoutSession.hasMany(models.WorkoutExercise, {
-        foreignKey: 'workout_id',
-        as: 'exercises'
+        foreignKey: 'workout_session_id', 
+        as: 'workout_exercises'
       });
+
 
     }
   }
@@ -38,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'No title'
+    },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     is_public: {
       type: DataTypes.BOOLEAN,

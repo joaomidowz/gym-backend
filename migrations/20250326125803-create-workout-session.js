@@ -10,6 +10,7 @@ module.exports = {
         allowNull: false,
       },
       title: { type: Sequelize.STRING, allowNull: false },
+      notes: { type: Sequelize.TEXT, allowNull: true },
       date: { type: Sequelize.DATEONLY, allowNull: false },
       is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
       user_id: {
