@@ -37,7 +37,7 @@ app.use('/workout-exercise', workoutExercisesRoutes)
 app.use('/workout-set', workoutSetRoutes)
 app.use('/likes', likeRoutes)
 app.use('/comments', commentRoutes)
-app.use('/feed', feedRoutes)
+app.use("/feed", feedRoutes);
 
 
 // Initiate
