@@ -7,55 +7,56 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       workout_exercise_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'workout_exercises',
-          key: 'id'
+          key: 'id',
         },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       workout_session_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'workout_sessions',
-          key: 'id'
+          key: 'id',
         },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       set_type: {
         type: Sequelize.ENUM('Warmup', 'Feeder', 'Work', 'Top'),
-        allowNull: false
+        allowNull: false,
       },
       weight: {
         type: Sequelize.FLOAT,
-        allowNull: true
+        allowNull: true,
       },
       reps: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       order: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        defaultValue: Sequelize.fn('NOW'),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
-      }
+        defaultValue: Sequelize.fn('NOW'),
+      },
     });
   },
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('WorkoutSets');
-  }
+    await queryInterface.dropTable('workout_sets');
+  },
 };
