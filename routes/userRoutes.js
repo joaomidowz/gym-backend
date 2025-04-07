@@ -15,6 +15,7 @@ router.post('/login', userController.login)
 router.get('/me', authMiddleware, userController.getLoggedUser);
 router.get('/streak', authMiddleware, getStreak);
 router.post('/streak/save', authMiddleware, useStreakSave);
+router.get('/search', authMiddleware, userController.searchUser)
 router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUserById)
 
 // PROTECTED ROUTES

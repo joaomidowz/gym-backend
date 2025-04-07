@@ -2,6 +2,7 @@ const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
+const { Op, where } = require("sequelize")
 
 //create user
 const createUser = async (req, res) => {
@@ -155,6 +156,31 @@ const deleteUser = async (req, res) => {
 }
 
 
+// GET //exercise=query
+const searchUser = async (req, res) => {
+    const query = req.query.query
+
+    if (!query) return res.status(400).json({ message: "Any Query informed" })
+
+    try {
+        const user = await User.findAll({
+            where: {
+              name: {
+                [Op.iLike]: `%${query}%`
+              },
+            },
+            attributes: ['id', 'name', 'is_public'] 
+          })
+          
+
+        res.json(user)
+    } catch (error) {
+        console.error("Error in search user", error)
+        res.status(500).json({ message: "Internal error on search user" })
+    }
+}
+
+
 module.exports = {
     createUser,
     login,
@@ -162,5 +188,6 @@ module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    searchUser
 };
