@@ -12,9 +12,11 @@ const updateWorkoutExerciseSummary = async (workout_exercise_id) => {
             weight: totalWeight,
             reps: totalReps,
             sets: totalSets,
-        }, {
-        where: { id: workout_exercise_id }
-    })
+        },
+        {
+            where: { id: workout_exercise_id },
+        }
+    )
 }
 
 // POST /workout-set/:exerciseId
@@ -26,7 +28,8 @@ const createSet = async (req, res) => {
         const exercise = await WorkoutExercise.findByPk(exerciseId)
         if (!exercise) return res.status(404).json({ error: 'WorkoutExercise not found.' })
 
-        const workout_session_id = exercise.workout_id
+        // ✅ CORREÇÃO AQUI
+        const workout_session_id = exercise.workout_session_id
 
         const newSet = await WorkoutSet.create({
             workout_exercise_id: exerciseId,
@@ -34,34 +37,35 @@ const createSet = async (req, res) => {
             set_type,
             weight,
             reps,
-            order
+            order,
         })
 
         await updateWorkoutExerciseSummary(exerciseId)
 
         res.status(201).json({ message: 'Set has been created', set: newSet })
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Erro ao criar set:', error)
+        res.status(500).json({ error: error.message })
     }
 }
 
-//GET /workout-set/:exerciseId
+// GET /workout-set/:exerciseId
 const getSetsByExercise = async (req, res) => {
     const { exerciseId } = req.params
 
     try {
         const sets = await WorkoutSet.findAll({
             where: { workout_exercise_id: exerciseId },
-            order: [['order', 'ASC']]
+            order: [['order', 'ASC']],
         })
 
         res.json({ sets })
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message })
     }
 }
 
-//PUT / workout-set/:setId
+// PUT /workout-set/:setId
 const updateSet = async (req, res) => {
     const { setId } = req.params
     const { set_type, weight, reps, order } = req.body
@@ -71,21 +75,21 @@ const updateSet = async (req, res) => {
 
         if (!set) return res.status(404).json({ message: 'Set not found.' })
 
-        if (set_type !== undefined) set.set_type = set_type;
-        if (weight !== undefined) set.weight = weight;
-        if (reps !== undefined) set.reps = reps;
-        if (order !== undefined) set.order = order;
+        if (set_type !== undefined) set.set_type = set_type
+        if (weight !== undefined) set.weight = weight
+        if (reps !== undefined) set.reps = reps
+        if (order !== undefined) set.order = order
 
         await set.save()
         await updateWorkoutExerciseSummary(set.workout_exercise_id)
 
         res.json({ message: 'Set updated with success.' })
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message })
     }
 }
 
-//DELETE / workout-set/:setId
+// DELETE /workout-set/:setId
 const deleteSet = async (req, res) => {
     const { setId } = req.params
 
@@ -101,14 +105,13 @@ const deleteSet = async (req, res) => {
 
         res.json({ message: 'Set deleted with success.' })
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message })
     }
-
 }
 
 module.exports = {
     createSet,
     getSetsByExercise,
     updateSet,
-    deleteSet
-}; 
+    deleteSet,
+}
