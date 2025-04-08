@@ -59,12 +59,12 @@ const isWorkoutExerciseOwnerOrAdmin = async (req, res, next) => {
 }
 
 const canAddExerciseToOwnSession = async (req, res, next) => {
-    const { workout_id } = req.body
+    const { workout_session_id } = req.body
     const userLoggedId = req.user.id
     const isAdmin = req.user.is_admin
 
     try {
-        const session = await WorkoutSession.findByPk(workout_id)
+        const session = await WorkoutSession.findByPk(workout_session_id)
 
         if (!session) return res.status(404).json({ message: 'Workout session not found.' })
 

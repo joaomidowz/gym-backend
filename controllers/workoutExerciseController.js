@@ -1,4 +1,4 @@
-const { WorkoutExercise, Exercise } = require('../models');
+const { WorkoutExercise, WorkoutSession, Exercise } = require('../models');
 
 // GET /workout-exercise
 const getAllWorkoutExercises = async (req, res) => {
@@ -13,24 +13,47 @@ const getAllWorkoutExercises = async (req, res) => {
     }
 };
 
+
 // POST /workout-exercise
 const createWorkoutExercise = async (req, res) => {
     const { workout_session_id, exercise_id } = req.body;
 
+    console.log("Requisição recebida:", req.body); // Debug
+
     if (!workout_session_id || !exercise_id) {
-        return res.status(400).json({ error: 'workout_session_id e exercise_id são obrigatórios' });
+        return res.status(400).json({ error: 'Campos obrigatórios: workout_session_id e exercise_id.' });
+    }
+
+    // Garantir que sejam números inteiros
+    const sessionId = Number(workout_session_id);
+    const exerciseId = Number(exercise_id);
+
+    if (isNaN(sessionId) || isNaN(exerciseId)) {
+        return res.status(400).json({ error: 'IDs inválidos (não numéricos).' });
     }
 
     try {
+        const session = await WorkoutSession.findByPk(sessionId);
+        if (!session) {
+            console.warn("Sessão não encontrada com ID:", sessionId);
+            return res.status(404).json({ message: 'Workout session not found.' });
+        }
+
+        const exercise = await Exercise.findByPk(exerciseId);
+        if (!exercise) {
+            console.warn("Exercício não encontrado com ID:", exerciseId);
+            return res.status(404).json({ message: 'Exercise not found.' });
+        }
+
         const workoutExercise = await WorkoutExercise.create({
-            workout_session_id,
-            exercise_id
+            workout_session_id: sessionId,
+            exercise_id: exerciseId
         });
 
-        res.status(201).json(workoutExercise);
+        return res.status(201).json(workoutExercise);
     } catch (error) {
         console.error('Erro ao criar workout exercise:', error);
-        res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: 'Erro interno ao criar workout exercise.' });
     }
 };
 
