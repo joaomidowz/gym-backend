@@ -40,10 +40,17 @@ const isWorkoutExerciseOwnerOrAdmin = async (req, res, next) => {
 
     try {
         const exercise = await WorkoutExercise.findByPk(exerciseId)
-        if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' })
+        if (!exercise) {
+            return res.status(404).json({ message: 'Workout exercise not found.' })
+        }
 
-        const session = await WorkoutSession.findByPk(exercise.workout_id)
-        if (!session) return res.status(404).json({ message: 'Workout session not found.' })
+        const session = await WorkoutSession.findByPk(exercise.workout_session_id)
+        if (!session) {
+            // ✅ Permitir remoção mesmo se a sessão foi deletada
+            console.warn(`Sessão do exercício ${exerciseId} não encontrada, mas seguindo com a ação.`)
+            req.exercise = exercise
+            return next()
+        }
 
         const isOwner = session.user_id === userLoggedId
 
@@ -52,9 +59,11 @@ const isWorkoutExerciseOwnerOrAdmin = async (req, res, next) => {
             return next()
         }
 
-        return res.status(403).json({ message: 'You do not have permission to modify or exclude this exercise.' })
+        return res.status(403).json({
+            message: 'You do not have permission to modify or exclude this exercise.',
+        })
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message })
     }
 }
 
