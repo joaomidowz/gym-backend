@@ -7,8 +7,15 @@ const getAllSessions = async function (req, res) {
     try {
         const sessions = await WorkoutSession.findAll({
             where: { user_id: req.user.id },
+            include: [
+              {
+                model: require('../models').User,
+                as: 'owner',
+                attributes: ['id', 'name', 'is_public'],
+              },
+            ],
             order: [['date', 'DESC']]
-        });
+          });
         res.json(sessions);
     } catch (error) {
         console.error('Get sessions error:', error);
