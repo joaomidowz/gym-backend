@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { WorkoutSession } = require('../models');
+const { WorkoutSession, User, Like, Comment, WorkoutExercise, WorkoutSet, Exercise } = require('../models');
 const { updateUserStreak } = require('../utils/streakUtils');
 
 // GET /workout-session
@@ -7,21 +7,73 @@ const getAllSessions = async function (req, res) {
     try {
         const sessions = await WorkoutSession.findAll({
             where: { user_id: req.user.id },
+            order: [['date', 'DESC']],
             include: [
-              {
-                model: require('../models').User,
-                as: 'owner',
-                attributes: ['id', 'name', 'is_public'],
-              },
+                {
+                    model: User,
+                    as: 'owner',
+                    attributes: ['id', 'name', 'is_public'],
+                },
+                {
+                    model: Like,
+                    as: 'likes',
+                    attributes: ['id', 'user_id'],
+                },
+                {
+                    model: Comment,
+                    as: 'comments',
+                    attributes: ['id', 'user_id', 'content', 'createdAt'],
+                    include: {
+                        model: User,
+                        as: 'user',
+                        attributes: ['id', 'name'],
+                    },
+                },
+                {
+                    model: WorkoutExercise,
+                    as: 'workout_exercises',
+                    include: [
+                        {
+                            model: WorkoutSet,
+                            as: 'workout_sets',
+                            attributes: ['weight'],
+                        },
+                        {
+                            model: Exercise,
+                            as: 'exercise',
+                            attributes: ['id', 'name'],
+                        },
+                    ],
+                },
             ],
-            order: [['date', 'DESC']]
-          });
-        res.json(sessions);
+        });
+
+        const formatted = sessions.map((session) => {
+            const allSets = session.workout_exercises.flatMap((ex) => ex.workout_sets || []);
+            const totalSets = allSets.length;
+            const totalWeight = allSets.reduce((sum, set) => sum + (set.weight || 0), 0);
+
+            return {
+                id: session.id,
+                title: session.title,
+                notes: session.notes,
+                date: session.date,
+                user: session.owner,
+                like_count: session.likes.length,
+                comments_count: session.comments.length,
+                total_sets: totalSets,
+                total_weight: totalWeight,
+                comments: session.comments,
+            };
+        });
+
+        res.json(formatted);
     } catch (error) {
         console.error('Get sessions error:', error);
         res.status(500).json({ error: error.message });
     }
-}
+};
+
 
 // POST /workout-session
 const createSession = async (req, res) => {
