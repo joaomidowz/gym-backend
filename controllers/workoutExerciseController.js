@@ -15,26 +15,23 @@ const getAllWorkoutExercises = async (req, res) => {
 
 // POST /workout-exercise
 const createWorkoutExercise = async (req, res) => {
-    const { workout_id, exercise_id, sets, reps, weight, notes } = req.body
+    const { session_id, exercise_id } = req.body;
 
-    if (!workout_id || !exercise_id || !sets || !reps) return res.status(400).json({ error: 'workout_id, exercise_id, sets and reps are required' })
+    if (!session_id || !exercise_id)
+        return res.status(400).json({ error: 'session_id and exercise_id are required' });
 
     try {
         const workoutExercise = await WorkoutExercise.create({
-            workout_id,
+            session_id,
             exercise_id,
-            sets,
-            reps,
-            weight,
-            notes
-        })
+        });
 
-        res.status(201).json(workoutExercise)
+        res.status(201).json(workoutExercise);
     } catch (error) {
-        console.error('Create workout exercise error:', error)
-        res.status(500).json({ error: error.message })
+        console.error('Create workout exercise error:', error);
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 // GET /workout-exercise/workout/:id
 const getWorkoutExerciseByWorkoutId = async (req, res) => {
@@ -58,7 +55,7 @@ const getWorkoutExerciseByWorkoutId = async (req, res) => {
 // PUT /workout-exercise/:id
 const updateWorkoutExercise = async (req, res) => {
     const { id } = req.params
-    const {  notes, exercise_id } = req.body
+    const { notes, exercise_id } = req.body
 
     try {
         const exercise = await WorkoutExercise.findByPk(id)
