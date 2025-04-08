@@ -15,15 +15,16 @@ const getAllWorkoutExercises = async (req, res) => {
 
 // POST /workout-exercise
 const createWorkoutExercise = async (req, res) => {
-    const { session_id, exercise_id } = req.body;
+    const { workout_session_id, exercise_id } = req.body;
 
-    if (!session_id || !exercise_id)
-        return res.status(400).json({ error: 'session_id and exercise_id are required' });
+    if (!workout_session_id || !exercise_id) {
+        return res.status(400).json({ error: 'workout_session_id e exercise_id são obrigatórios' });
+    }
 
     try {
         const workoutExercise = await WorkoutExercise.create({
-            session_id,
-            exercise_id,
+            workout_session_id,
+            exercise_id
         });
 
         res.status(201).json(workoutExercise);
