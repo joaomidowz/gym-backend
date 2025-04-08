@@ -1,4 +1,16 @@
 'use strict';
+
+const VALID_MUSCLE_GROUPS = [
+  "Peito",
+  "Costas",
+  "Bíceps",
+  "Tríceps",
+  "Pernas",
+  "Ombros",
+  "Core",
+  "Outros"
+];
+
 const {
   Model
 } = require('sequelize');
@@ -22,14 +34,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
 
     },
-    category: {
+    description: {
       type: DataTypes.STRING,
       allowNull: false
 
-    },
-    thumbUrl: {
-      type: DataTypes.STRING,
-      allowNull: true
     },
     user_id: {
       type: DataTypes.INTEGER,
@@ -44,6 +52,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    muscle_group: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Outros',
+      validate: {
+        isIn: {
+          args: [VALID_MUSCLE_GROUPS],
+          msg: 'Grupo muscular inválido'
+        }
+      }
     }
   }, {
     sequelize,

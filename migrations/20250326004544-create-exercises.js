@@ -19,6 +19,11 @@ module.exports = {
         onDelete: 'SET NULL',
         allowNull: true
       },
+      muscle_group: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'Outros' 
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
