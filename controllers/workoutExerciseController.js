@@ -1,17 +1,17 @@
-const { WorkoutExercise, Exercise } = require('../models')
+const { WorkoutExercise, Exercise } = require('../models');
 
 // GET /workout-exercise
 const getAllWorkoutExercises = async (req, res) => {
     try {
         const exercises = await WorkoutExercise.findAll({
             include: [{ model: Exercise, as: 'exercise' }]
-        })
-        res.json(exercises)
+        });
+        res.json(exercises);
     } catch (error) {
-        console.error('Get workout exercises error: ', error)
-        res.status(500).json({ error: error.message })
+        console.error('Get workout exercises error: ', error);
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 // POST /workout-exercise
 const createWorkoutExercise = async (req, res) => {
@@ -29,69 +29,71 @@ const createWorkoutExercise = async (req, res) => {
 
         res.status(201).json(workoutExercise);
     } catch (error) {
-        console.error('Create workout exercise error:', error);
+        console.error('Erro ao criar workout exercise:', error);
         res.status(500).json({ error: error.message });
     }
 };
 
 // GET /workout-exercise/workout/:id
 const getWorkoutExerciseByWorkoutId = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
         const exercises = await WorkoutExercise.findAll({
-            where: { workout_id: id },
+            where: { workout_session_id: id },
             include: [{ model: Exercise, as: 'exercise' }]
-        })
+        });
 
-        if (!exercises.length) return res.status(404).json({ message: 'No exercises found for this workout session.' })
+        if (!exercises.length) {
+            return res.status(404).json({ message: 'No exercises found for this workout session.' });
+        }
 
-        res.json(exercises)
+        res.json(exercises);
     } catch (error) {
-        console.error('Get workout exercises error: ', error)
-        res.status(500).json({ error: error.message })
+        console.error('Get workout exercises error: ', error);
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 // PUT /workout-exercise/:id
 const updateWorkoutExercise = async (req, res) => {
-    const { id } = req.params
-    const { notes, exercise_id } = req.body
+    const { id } = req.params;
+    const { notes, exercise_id } = req.body;
 
     try {
-        const exercise = await WorkoutExercise.findByPk(id)
+        const exercise = await WorkoutExercise.findByPk(id);
 
-        if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' })
+        if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' });
 
-        if (exercise_id !== undefined) exercise.exercise_id = exercise_id;;
+        if (exercise_id !== undefined) exercise.exercise_id = exercise_id;
         if (notes !== undefined) exercise.notes = notes;
 
-        await exercise.save()
+        await exercise.save();
 
-        res.json({ message: 'Workout exercise has been updated successfully', exercise })
+        res.json({ message: 'Workout exercise has been updated successfully', exercise });
     } catch (error) {
-        console.error('Update workout exercise error: ', error)
-        res.status(500).json({ error: error.message })
+        console.error('Update workout exercise error: ', error);
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
-//DELETE /workout-exercise/:id
+// DELETE /workout-exercise/:id
 const deleteWorkoutExercise = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
-        const exercise = await WorkoutExercise.findByPk(id)
+        const exercise = await WorkoutExercise.findByPk(id);
 
-        if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' })
+        if (!exercise) return res.status(404).json({ message: 'Workout exercise not found.' });
 
-        await exercise.destroy()
+        await exercise.destroy();
 
-        res.json({ message: 'Workout exercise has been deleted successfully', exercise })
+        res.json({ message: 'Workout exercise has been deleted successfully', exercise });
     } catch (error) {
-        console.error('Delete workout exercise error: ', error)
-        res.status(500).json({ error: error.message })
+        console.error('Delete workout exercise error: ', error);
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 module.exports = {
     getAllWorkoutExercises,
@@ -99,4 +101,4 @@ module.exports = {
     getWorkoutExerciseByWorkoutId,
     updateWorkoutExercise,
     deleteWorkoutExercise
-}
+};
