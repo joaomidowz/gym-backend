@@ -67,7 +67,11 @@ const getPublicFeed = async (req, res) => {
         title: session.title,
         notes: session.notes,
         date: session.date,
-        user: session.owner,
+        user: {
+          id: session.owner?.id,
+          name: session.owner?.name || "Desconhecido",
+          is_public: session.owner?.is_public,
+        },
         like_count: session.likes.length,
         comments_count: session.comments.length,
         total_sets: totalSets,
