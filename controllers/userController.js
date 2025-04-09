@@ -103,38 +103,64 @@ const getUserById = async (req, res) => {
 }
 
 // PUT / user
+
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { height_cm, weight_kg, password } = req.body;
+    const {
+        height_cm,
+        weight_kg,
+        email,
+        current_password,
+        new_password,
+    } = req.body;
 
-    // Se nenhum campo for enviado
-    if (!height_cm && !weight_kg && !password) {
-        return res.status(400).json({ error: 'Pelo menos um campo deve ser preenchido (altura, peso ou senha).' });
+    // Verifica se pelo menos um campo foi enviado
+    if (
+        height_cm === undefined &&
+        weight_kg === undefined &&
+        email === undefined &&
+        (current_password === undefined || new_password === undefined)
+    ) {
+        return res.status(400).json({
+            error:
+                "Pelo menos um campo deve ser preenchido (altura, peso, email ou senha).",
+        });
     }
 
     try {
         const user = await User.findByPk(id);
 
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ error: "Usuário não encontrado." });
         }
 
-        // Atualiza altura se enviada
+        // Atualiza altura
         if (height_cm !== undefined) user.height_cm = height_cm;
 
-        // Atualiza peso se enviado
+        // Atualiza peso
         if (weight_kg !== undefined) user.weight_kg = weight_kg;
 
-        // Atualiza senha se enviada
-        if (password !== undefined && password.trim() !== '') {
-            const hashedPassword = await bcrypt.hash(password, 10);
+        // Atualiza e-mail
+        if (email !== undefined && email !== user.email) {
+            user.email = email;
+        }
+
+        // Troca de senha (com validação da atual)
+        if (current_password && new_password) {
+            const match = await bcrypt.compare(current_password, user.password);
+
+            if (!match) {
+                return res.status(401).json({ error: "Senha atual incorreta." });
+            }
+
+            const hashedPassword = await bcrypt.hash(new_password, 10);
             user.password = hashedPassword;
         }
 
         await user.save();
 
-        res.json({
-            message: 'Usuário atualizado com sucesso.',
+        return res.json({
+            message: "Usuário atualizado com sucesso.",
             user: {
                 id: user.id,
                 name: user.name,
@@ -144,10 +170,13 @@ const updateUser = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Erro ao atualizar usuário:', error);
-        res.status(500).json({ error: 'Erro interno ao atualizar usuário.' });
+        console.error("Erro ao atualizar usuário:", error);
+        return res
+            .status(500)
+            .json({ error: "Erro interno ao atualizar usuário." });
     }
 };
+
 
 // DELETE / user
 const deleteUser = async (req, res) => {
@@ -177,13 +206,13 @@ const searchUser = async (req, res) => {
     try {
         const user = await User.findAll({
             where: {
-              name: {
-                [Op.iLike]: `%${query}%`
-              },
+                name: {
+                    [Op.iLike]: `%${query}%`
+                },
             },
-            attributes: ['id', 'name', 'is_public'] 
-          })
-          
+            attributes: ['id', 'name', 'is_public']
+        })
+
 
         res.json(user)
     } catch (error) {

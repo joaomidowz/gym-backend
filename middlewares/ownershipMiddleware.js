@@ -1,12 +1,16 @@
 const isUserOwnerOrAdmin = (req, res, next) => {
-    const userIdParam = parseInt(req.params.id)
-    const userLoggedId = req.user.id
-    const isAdmin = req.user.is_admin
+    const userIdParam = parseInt(req.params.id);
+    const userLoggedId = req.user.id;
+    const isAdmin = !!req.user.is_admin;
 
-    if (userLoggedId === userIdParam || isAdmin) return next()
+    if (userLoggedId === userIdParam || isAdmin) {
+        return next();
+    }
 
-    res.status(403).json({ message: 'You do not have permissions to perform this action.' })
-}
+    return res.status(403).json({
+        message: 'Você não tem permissão para realizar essa ação.',
+    });
+};
 
 const { WorkoutSession } = require('../models');
 
