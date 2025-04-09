@@ -1,22 +1,24 @@
 const express = require('express')
 const router = express.Router()
-const workoutSetController= require('../controllers/workoutSetController')
+const workoutSetController = require('../controllers/workoutSetController')
 const authMiddleware = require('../middlewares/authMiddleware')
 const isSetOwnerOrAdmin = require('../middlewares/setMiddleware')
 
-//All protected
 router.use(authMiddleware)
 
-// POST
+// POST /workout-set/:exerciseId
 router.post('/:exerciseId', workoutSetController.createSet)
 
-// GET
+// GET /workout-set/exercise/:workoutExerciseId
 router.get('/exercise/:workoutExerciseId', workoutSetController.getSetsByExercise)
 
-// UPDATE
+// GET /workout-set/:id
+router.get('/:id', workoutSetController.getSetById)
+
+// PUT /workout-set/:id
 router.put('/:id', isSetOwnerOrAdmin, workoutSetController.updateSet)
 
-// DELETE
+// DELETE /workout-set/:id
 router.delete('/:id', isSetOwnerOrAdmin, workoutSetController.deleteSet)
 
 module.exports = router
