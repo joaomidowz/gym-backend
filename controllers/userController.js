@@ -104,38 +104,50 @@ const getUserById = async (req, res) => {
 
 // PUT / user
 const updateUser = async (req, res) => {
-    const { id } = req.params
-    const { height_cm, weight_kg } = req.body
+    const { id } = req.params;
+    const { height_cm, weight_kg, password } = req.body;
 
-    if (!height_cm && !weight_kg) return res.status(400).json({ error: 'At least one field (height our weight) must be provide' })
+    // Se nenhum campo for enviado
+    if (!height_cm && !weight_kg && !password) {
+        return res.status(400).json({ error: 'Pelo menos um campo deve ser preenchido (altura, peso ou senha).' });
+    }
 
     try {
-        const user = await User.findByPk(id)
+        const user = await User.findByPk(id);
 
-        if (!user) return res.status(404).json({ error: 'User not Found' })
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
 
-        if (height_cm !== undefined) user.height_cm = height_cm
-        if (weight_kg !== undefined) user.weight_kg = weight_kg
+        // Atualiza altura se enviada
+        if (height_cm !== undefined) user.height_cm = height_cm;
 
-        await user.save()
+        // Atualiza peso se enviado
+        if (weight_kg !== undefined) user.weight_kg = weight_kg;
+
+        // Atualiza senha se enviada
+        if (password !== undefined && password.trim() !== '') {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            user.password = hashedPassword;
+        }
+
+        await user.save();
 
         res.json({
-            message: 'User update successfully',
+            message: 'Usuário atualizado com sucesso.',
             user: {
                 id: user.id,
                 name: user.name,
                 email: user.email,
                 height_cm: user.height_cm,
                 weight_kg: user.weight_kg,
-                streak_count: user.streak_count
-            }
-        })
-
+            },
+        });
     } catch (error) {
-        console.error('Update user error:', error)
-        res.status(500).json({ error: error.message })
+        console.error('Erro ao atualizar usuário:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar usuário.' });
     }
-}
+};
 
 // DELETE / user
 const deleteUser = async (req, res) => {
