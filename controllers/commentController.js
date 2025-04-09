@@ -1,4 +1,4 @@
-const { Comment, WorkoutSession } = require('../models')
+const { Comment, WorkoutSession, User } = require('../models')
 
 const postComment = async (req, res) => {
     const { session_id, content } = req.body
@@ -26,6 +26,11 @@ const getCommentBySession = async (req, res) => {
         const comments = await Comment.findAll({
 
             where: { session_id: req.params.sessionId },
+            include: {
+                model: User,
+                as: 'user',
+                attributes: ['id', 'name'],
+            },
             order: [['createdAt', 'DESC']]
         })
 
