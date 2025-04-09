@@ -57,6 +57,12 @@ const getPublicFeed = async (req, res) => {
       ],
     });
 
+    const likedSessions = await Like.findAll({
+      where: { user_id: req.user.id },
+      attributes: ['session_id'],
+    });
+    const likedSessionIds = likedSessions.map((like) => like.session_id);
+
     const formatted = sessions.map((session) => {
       const allSets = session.workout_exercises.flatMap((ex) => ex.workout_sets || []);
       const totalSets = allSets.length;
@@ -77,6 +83,7 @@ const getPublicFeed = async (req, res) => {
         total_sets: totalSets,
         total_weight: totalWeight,
         comments: session.comments,
+        is_liked: likedSessionIds.includes(session.id),
       };
     });
 

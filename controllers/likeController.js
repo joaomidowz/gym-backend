@@ -40,7 +40,6 @@ const unlikeSession = async (req, res) => {
     }
   };
   
-
 module.exports = {
     likeSession,
     unlikeSession
