@@ -64,8 +64,17 @@ const getWorkoutExerciseByWorkoutId = async (req, res) => {
     try {
         const exercises = await WorkoutExercise.findAll({
             where: { workout_session_id: id },
-            include: [{ model: Exercise, as: 'exercise' }]
-        });
+            include: [
+              { model: Exercise, as: 'exercise' },
+              {
+                model: require('../models').WorkoutSet,
+                as: 'workout_sets',
+                separate: true,
+                order: [['order', 'ASC']],
+              }
+            ]
+          });
+          
 
         if (!exercises.length) {
             return res.status(404).json({ message: 'No exercises found for this workout session.' });
