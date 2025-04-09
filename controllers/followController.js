@@ -41,7 +41,7 @@ const unfollowUser = async (req, res) => {
 
 //GET
 const getFollowers = async (req, res) => {
-    const { userId } = req.params
+    const { userId } = req.params;
 
     try {
         const followers = await Follow.findAll({
@@ -51,18 +51,21 @@ const getFollowers = async (req, res) => {
                 as: 'follower',
                 attributes: ['id', 'name']
             }
-        })
+        });
 
-        res.json({ count: followers.length, followers })
+        // Extrair só o seguidor (para evitar estrutura nested)
+        const simplified = followers.map((f) => f.follower);
+
+        res.json(simplified);
     } catch (error) {
-        console.error('Get followers error: ', error)
-        return res.status(500).json({ error: error.message })
+        console.error('Get followers error: ', error);
+        return res.status(500).json({ error: error.message });
     }
-}
+};
 
 //GET / Following
 const getFollowing = async (req, res) => {
-    const { userId } = req.params
+    const { userId } = req.params;
 
     try {
         const following = await Follow.findAll({
@@ -72,41 +75,44 @@ const getFollowing = async (req, res) => {
                 as: 'following',
                 attributes: ['id', 'name']
             }
-        })
-        res.json({ count: following.length, following })
+        });
+
+        const simplified = following.map((f) => f.following);
+        res.json(simplified);
     } catch (error) {
-        console.error('Get following error: ', error)
-        return res.status(500).json({ error: error.message })
+        console.error('Get following error: ', error);
+        return res.status(500).json({ error: error.message });
     }
-}
+};
+
 
 const checkIfFollowing = async (req, res) => {
     const followerId = req.user.id;
     const followingId = parseInt(req.params.userId);
-  
+
     if (followerId === followingId) {
-      return res.json({ is_following: false });
+        return res.json({ is_following: false });
     }
-  
+
     try {
-      const follow = await Follow.findOne({
-        where: {
-          follower_id: followerId,
-          following_id: followingId,
-        },
-      });
-  
-      return res.json({ is_following: !!follow });
+        const follow = await Follow.findOne({
+            where: {
+                follower_id: followerId,
+                following_id: followingId,
+            },
+        });
+
+        return res.json({ is_following: !!follow });
     } catch (error) {
-      console.error("Erro ao verificar follow:", error);
-      return res.status(500).json({ error: "Erro ao verificar follow" });
+        console.error("Erro ao verificar follow:", error);
+        return res.status(500).json({ error: "Erro ao verificar follow" });
     }
-  };  
+};
 
 module.exports = {
     followUser,
     unfollowUser,
     getFollowers,
     getFollowing,
-    checkIfFollowing 
+    checkIfFollowing
 }
