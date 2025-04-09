@@ -23,7 +23,7 @@ const followUser = async (req, res) => {
 // DELETE
 const unfollowUser = async (req, res) => {
     const followerId = req.user.id
-    const followingId = parseInt(req.params.UserId)
+    const followingId = parseInt(req.params.userId)
 
     try {
         const follow = await Follow.findOne({
@@ -80,9 +80,33 @@ const getFollowing = async (req, res) => {
     }
 }
 
+const checkIfFollowing = async (req, res) => {
+    const followerId = req.user.id;
+    const followingId = parseInt(req.params.userId);
+  
+    if (followerId === followingId) {
+      return res.json({ is_following: false });
+    }
+  
+    try {
+      const follow = await Follow.findOne({
+        where: {
+          follower_id: followerId,
+          following_id: followingId,
+        },
+      });
+  
+      return res.json({ is_following: !!follow });
+    } catch (error) {
+      console.error("Erro ao verificar follow:", error);
+      return res.status(500).json({ error: "Erro ao verificar follow" });
+    }
+  };  
+
 module.exports = {
     followUser,
     unfollowUser,
     getFollowers,
-    getFollowing
+    getFollowing,
+    checkIfFollowing 
 }

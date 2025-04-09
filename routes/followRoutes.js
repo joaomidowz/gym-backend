@@ -16,5 +16,6 @@ router.get('/followers/:userId', authMiddleware, followController.getFollowers)
 
 // FOLLOWING
 router.get('/following/:userId', authMiddleware, followController.getFollowing)
+router.get('/check/:userId', authMiddleware, followController.checkIfFollowing)
 
 module.exports = router
