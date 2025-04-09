@@ -14,7 +14,15 @@ const postComment = async (req, res) => {
             content
         })
 
-        return res.status(201).json(comment)
+        const fullComment = await Comment.findByPk(comment.id, {
+            include: {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'name'],
+            },
+          });
+
+        return res.status(201).json(fullComment)
     } catch (error) {
         console.error('[POST COMMENT ERROR]', error);
         return res.status(500).json({ message: 'Error posting comment.', error });
