@@ -23,18 +23,23 @@ const likeSession = async (req, res) => {
 }
 
 const unlikeSession = async (req, res) => {
+    const { session_id } = req.body;
+  
     try {
-        const like = await Like.findByPk(req.params.id)
-
-        if (!like) return res.status(404).json({ message: 'Like not found.' })
-
-        await like.destroy()
-
-        return res.status(201).json({ message: 'Like removed with success' })
+      const like = await Like.findOne({
+        where: { session_id, user_id: req.user.id }
+      });
+  
+      if (!like) return res.status(404).json({ message: 'Like not found.' });
+  
+      await like.destroy();
+  
+      return res.status(200).json({ message: 'Like removed successfully' });
     } catch (error) {
-        return res.status(500).json({ message: 'error to remove like this session ' })
+      return res.status(500).json({ message: 'Error to remove like from this session' });
     }
-}
+  };
+  
 
 module.exports = {
     likeSession,
