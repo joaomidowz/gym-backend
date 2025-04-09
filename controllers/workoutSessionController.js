@@ -118,10 +118,25 @@ const getSessionByUser = async (req, res) => {
 
 const getSessionById = async (req, res) => {
     try {
-        const session = req.session;
+        const { id } = req.params;
+
+        const session = await WorkoutSession.findByPk(id, {
+            include: [
+                {
+                    model: User,
+                    as: 'owner',
+                    attributes: ['id', 'name'],
+                },
+            ],
+        });
+
+        if (!session) {
+            return res.status(404).json({ error: "Sessão não encontrada" });
+        }
+
         return res.status(200).json(session);
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 };
 
