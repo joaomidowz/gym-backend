@@ -32,7 +32,7 @@ const getAllExercise = async (req, res) => {
 
 // POST /exercises
 const createExercise = async (req, res) => {
-  const { name, description, image_url, muscle_group, is_global = false } = req.body;
+  const { name, description, muscle_group, is_global = false } = req.body;
 
   if (!name || !muscle_group) {
     return res.status(400).json({ error: 'Nome e grupo muscular são obrigatórios.' });
@@ -46,7 +46,6 @@ const createExercise = async (req, res) => {
     const exercise = await Exercise.create({
       name,
       description,
-      image_url,
       muscle_group,
       is_global,
       user_id: req.user.id
