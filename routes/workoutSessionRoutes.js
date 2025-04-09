@@ -8,6 +8,7 @@ const { isSessionOwnerOrAdmin } = require('../middlewares/ownershipMiddleware')
 // GET 
 router.get('/', authMiddleware, workoutSessionController.getAllSessions)
 router.get('/search', authMiddleware, workoutSessionController.searchSession)
+router.get('/user/:id/public-sessions', authMiddleware, workoutSessionController.getPublicSessionsByUser);
 
 // GET UNIQUE SESSION
 router.get('/:id', authMiddleware, checkSessionVisibility, workoutSessionController.getSessionById)

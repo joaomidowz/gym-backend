@@ -58,4 +58,29 @@ const useStreakSave = async (req, res) => {
     }
 }
 
-module.exports = { getStreak, useStreakSave };
+
+const getUserStreakById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const streak = await UserStreak.findOne({
+            where: { user_id: id },
+            attributes: ['current_streak', 'longest_streak', 'last_workout_date']
+        });
+
+        if (!streak) {
+            return res.status(200).json({
+                current_streak: 0,
+                longest_streak: 0,
+                last_workout_date: null
+            });
+        }
+
+        res.json(streak);
+    } catch (error) {
+        console.error("Erro ao buscar streak pública:", error);
+        res.status(500).json({ error: "Erro ao buscar streak do usuário" });
+    }
+};
+
+
+module.exports = { getStreak, useStreakSave, getUserStreakById };

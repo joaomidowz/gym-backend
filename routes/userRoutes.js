@@ -4,7 +4,7 @@ const userController = require('../controllers/userController')
 const authMiddleware = require('../middlewares/authMiddleware')
 const { checkProfileVisibility } = require('../middlewares/visibilityMiddleware');
 const { isUserOwnerOrAdmin } = require('../middlewares/ownershipMiddleware');
-const { getStreak, useStreakSave } = require('../controllers/streakController');
+const { getStreak, useStreakSave, getUserStreakById  } = require('../controllers/streakController');
 
 
 // PUBLIC ROUTES
@@ -14,6 +14,7 @@ router.post('/login', userController.login)
 // PRIVATE ROUTE
 router.get('/me', authMiddleware, userController.getLoggedUser);
 router.get('/streak', authMiddleware, getStreak);
+router.get("/:id/streak", getUserStreakById);
 router.post('/streak/save', authMiddleware, useStreakSave);
 router.get('/search', authMiddleware, userController.searchUser)
 router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUserById)

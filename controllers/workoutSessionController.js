@@ -204,6 +204,26 @@ const searchSession = async (req, res) => {
     }
 }
 
+// GET /user/:id/public-sessions
+const getPublicSessionsByUser = async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const sessions = await WorkoutSession.findAll({
+        where: {
+          user_id: id,
+          is_public: true
+        },
+        order: [['date', 'DESC']]
+      });
+  
+      res.json(sessions);
+    } catch (error) {
+      console.error("Erro ao buscar sessões públicas:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };
+
 module.exports = {
     getAllSessions,
     createSession,
@@ -211,5 +231,6 @@ module.exports = {
     getSessionById,
     updateSession,
     deleteSession,
-    searchSession
+    searchSession,
+    getPublicSessionsByUser,
 };
