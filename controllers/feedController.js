@@ -72,7 +72,7 @@ const getPublicFeed = async (req, res) => {
         id: session.id,
         title: session.title,
         notes: session.notes,
-        date: session.date,
+        createdAt: session.createdAt,
         user: {
           id: session.owner?.id,
           name: session.owner?.name || "Desconhecido",
