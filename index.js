@@ -16,7 +16,10 @@ const PORT = 3001;
 
 // Middlewares
 // Allowed frontends
-const allowedOrigins = ['http://localhost:3000', 'gym-frontend-gray.vercel.app/']
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://gym-frontend-gray.vercel.app'
+];
 
 app.use(cors({
     origin: allowedOrigins,
