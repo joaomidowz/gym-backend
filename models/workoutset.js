@@ -55,6 +55,11 @@ module.exports = (sequelize, DataTypes) => {
         min: 1,
       },
     },
+    done: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },      
   }, {
     sequelize,
     modelName: 'WorkoutSet',
