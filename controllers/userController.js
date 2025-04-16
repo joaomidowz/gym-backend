@@ -107,75 +107,70 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { id } = req.params;
     const {
-        height_cm,
-        weight_kg,
-        email,
-        current_password,
-        new_password,
+      height_cm,
+      weight_kg,
+      email,
+      current_password,
+      new_password,
+      is_public,
     } = req.body;
-
-    // Verifica se pelo menos um campo foi enviado
+  
     if (
-        height_cm === undefined &&
-        weight_kg === undefined &&
-        email === undefined &&
-        (current_password === undefined || new_password === undefined)
+      height_cm === undefined &&
+      weight_kg === undefined &&
+      email === undefined &&
+      is_public === undefined &&
+      (current_password === undefined || new_password === undefined)
     ) {
-        return res.status(400).json({
-            error:
-                "Pelo menos um campo deve ser preenchido (altura, peso, email ou senha).",
-        });
+      return res.status(400).json({
+        error: "Need fill any field, heigh, weight, email, password or visibility.",
+      });
     }
-
+  
     try {
-        const user = await User.findByPk(id);
-
-        if (!user) {
-            return res.status(404).json({ error: "Usuário não encontrado." });
+      const user = await User.findByPk(id);
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found." });
+      }
+  
+      if (height_cm !== undefined) user.height_cm = height_cm;
+      if (weight_kg !== undefined) user.weight_kg = weight_kg;
+      if (email !== undefined && email !== user.email) {
+        user.email = email;
+      }
+      if (is_public !== undefined) user.is_public = is_public;
+  
+      if (current_password && new_password) {
+        const match = await bcrypt.compare(current_password, user.password);
+  
+        if (!match) {
+          return res.status(401).json({ error: "Actual password incorrect." });
         }
-
-        // Atualiza altura
-        if (height_cm !== undefined) user.height_cm = height_cm;
-
-        // Atualiza peso
-        if (weight_kg !== undefined) user.weight_kg = weight_kg;
-
-        // Atualiza e-mail
-        if (email !== undefined && email !== user.email) {
-            user.email = email;
-        }
-
-        // Troca de senha (com validação da atual)
-        if (current_password && new_password) {
-            const match = await bcrypt.compare(current_password, user.password);
-
-            if (!match) {
-                return res.status(401).json({ error: "Senha atual incorreta." });
-            }
-
-            const hashedPassword = await bcrypt.hash(new_password, 10);
-            user.password = hashedPassword;
-        }
-
-        await user.save();
-
-        return res.json({
-            message: "Usuário atualizado com sucesso.",
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                height_cm: user.height_cm,
-                weight_kg: user.weight_kg,
-            },
-        });
+  
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+        user.password = hashedPassword;
+      }
+  
+      await user.save();
+  
+      return res.json({
+        message: "User updated with success.",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          height_cm: user.height_cm,
+          weight_kg: user.weight_kg,
+          is_public: user.is_public,
+        },
+      });
     } catch (error) {
-        console.error("Erro ao atualizar usuário:", error);
-        return res
-            .status(500)
-            .json({ error: "Erro interno ao atualizar usuário." });
+      console.error("Error to update user:", error);
+      return res.status(500).json({ error: "Internal error to user." });
     }
-};
+  };
+  
 
 
 // DELETE / user
