@@ -30,6 +30,17 @@ const getAllExercise = async (req, res) => {
   }
 };
 
+const getExercisesAdmin = async (req, res) => {
+  try {
+    if (!req.user.is_admin) return res.status(403).json({ error: "Access denied. Only administrator." });
+    const exercises = await Exercise.findAll();
+    res.json(exercises);
+  } catch (error) {
+    console.error('Get exercises error: ', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // POST /exercises
 const createExercise = async (req, res) => {
   const { name, description, muscle_group, is_global = false } = req.body;
@@ -133,5 +144,6 @@ module.exports = {
   createExercise,
   alterExercise,
   deleteExercise,
-  searchExercise
+  searchExercise,
+  getExercisesAdmin
 };
