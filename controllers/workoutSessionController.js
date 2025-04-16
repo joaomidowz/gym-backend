@@ -194,7 +194,18 @@ const searchSession = async (req, res) => {
                 title: {
                     [Op.iLike]: `%${query}%`
                 },
-            }
+                is_public: true,
+            },
+            include: [
+                {
+                    model: User,
+                    as: 'owner',
+                    where: {
+                        is_public: true,
+                    },
+                    attributes: ['id', 'name']
+                }
+            ]
         });
 
         res.json(session);
@@ -202,27 +213,28 @@ const searchSession = async (req, res) => {
         console.error("Error in search session", error);
         res.status(500).json({ message: "Internal error on search session" });
     }
-}
+};
+
 
 // GET /user/:id/public-sessions
 const getPublicSessionsByUser = async (req, res) => {
     const { id } = req.params;
-  
+
     try {
-      const sessions = await WorkoutSession.findAll({
-        where: {
-          user_id: id,
-          is_public: true
-        },
-        order: [['date', 'DESC']]
-      });
-  
-      res.json(sessions);
+        const sessions = await WorkoutSession.findAll({
+            where: {
+                user_id: id,
+                is_public: true
+            },
+            order: [['date', 'DESC']]
+        });
+
+        res.json(sessions);
     } catch (error) {
-      console.error("Erro ao buscar sessões públicas:", error);
-      res.status(500).json({ error: error.message });
+        console.error("Erro ao buscar sessões públicas:", error);
+        res.status(500).json({ error: error.message });
     }
-  };
+};
 
 module.exports = {
     getAllSessions,

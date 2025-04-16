@@ -204,6 +204,7 @@ const searchUser = async (req, res) => {
                 name: {
                     [Op.iLike]: `%${query}%`
                 },
+                is_public: true
             },
             attributes: ['id', 'name', 'is_public']
         })
