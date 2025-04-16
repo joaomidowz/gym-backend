@@ -22,6 +22,7 @@ const getPublicFeed = async (req, res) => {
           model: User,
           as: 'owner',
           attributes: ['id', 'name', 'is_public'],
+          where: { is_public: true }, 
         },
         {
           model: Like,
