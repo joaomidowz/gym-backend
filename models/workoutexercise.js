@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },    
   }, {
     sequelize,
     modelName: 'WorkoutExercise',

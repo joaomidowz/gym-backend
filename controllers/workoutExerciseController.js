@@ -13,23 +13,21 @@ const getAllWorkoutExercises = async (req, res) => {
     }
 };
 
-
 // POST /workout-exercise
 const createWorkoutExercise = async (req, res) => {
     const { workout_session_id, exercise_id } = req.body;
 
-    console.log("Requisição recebida:", req.body); // Debug
+    console.log("Requisição recebida:", req.body);
 
     if (!workout_session_id || !exercise_id) {
-        return res.status(400).json({ error: 'Campos obrigatórios: workout_session_id e exercise_id.' });
+        return res.status(400).json({ error: 'Required: workout_session_id and exercise_id.' });
     }
 
-    // Garantir que sejam números inteiros
     const sessionId = Number(workout_session_id);
     const exerciseId = Number(exercise_id);
 
     if (isNaN(sessionId) || isNaN(exerciseId)) {
-        return res.status(400).json({ error: 'IDs inválidos (não numéricos).' });
+        return res.status(400).json({ error: 'Invalid IDs' });
     }
 
     try {
@@ -47,7 +45,8 @@ const createWorkoutExercise = async (req, res) => {
 
         const workoutExercise = await WorkoutExercise.create({
             workout_session_id: sessionId,
-            exercise_id: exerciseId
+            exercise_id: exerciseId,
+            name: exercise.name // <-- aqui está o diferencial!
         });
 
         return res.status(201).json(workoutExercise);
@@ -65,16 +64,19 @@ const getWorkoutExerciseByWorkoutId = async (req, res) => {
         const exercises = await WorkoutExercise.findAll({
             where: { workout_session_id: id },
             include: [
-              { model: Exercise, as: 'exercise' },
-              {
-                model: require('../models').WorkoutSet,
-                as: 'workout_sets',
-                separate: true,
-                order: [['order', 'ASC']],
-              }
+                {
+                    model: Exercise,
+                    as: 'exercise',
+                    required: false
+                },
+                {
+                    model: require('../models').WorkoutSet,
+                    as: 'workout_sets',
+                    separate: true,
+                    order: [['order', 'ASC']],
+                }
             ]
-          });
-          
+        });
 
         if (!exercises.length) {
             return res.status(404).json({ message: 'No exercises found for this workout session.' });
