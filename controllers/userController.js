@@ -20,7 +20,11 @@ const createUser = async (req, res) => {
         })
 
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            {
+                id: user.id,
+                email: user.email,
+                is_admin: user.is_admin,
+            },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
@@ -66,7 +70,15 @@ const login = async (req, res) => {
         const match = await bcrypt.compare(password, user.password)
         if (!match) return res.status(401).json({ error: 'Incorrect password' })
 
-        const token = jwt.sign({ id: user.id, email: user.email, }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+                is_admin: user.is_admin,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
 
         res.json({
             token,
@@ -107,70 +119,70 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { id } = req.params;
     const {
-      height_cm,
-      weight_kg,
-      email,
-      current_password,
-      new_password,
-      is_public,
+        height_cm,
+        weight_kg,
+        email,
+        current_password,
+        new_password,
+        is_public,
     } = req.body;
-  
+
     if (
-      height_cm === undefined &&
-      weight_kg === undefined &&
-      email === undefined &&
-      is_public === undefined &&
-      (current_password === undefined || new_password === undefined)
+        height_cm === undefined &&
+        weight_kg === undefined &&
+        email === undefined &&
+        is_public === undefined &&
+        (current_password === undefined || new_password === undefined)
     ) {
-      return res.status(400).json({
-        error: "Need fill any field, heigh, weight, email, password or visibility.",
-      });
+        return res.status(400).json({
+            error: "Need fill any field, heigh, weight, email, password or visibility.",
+        });
     }
-  
+
     try {
-      const user = await User.findByPk(id);
-  
-      if (!user) {
-        return res.status(404).json({ error: "User not found." });
-      }
-  
-      if (height_cm !== undefined) user.height_cm = height_cm;
-      if (weight_kg !== undefined) user.weight_kg = weight_kg;
-      if (email !== undefined && email !== user.email) {
-        user.email = email;
-      }
-      if (is_public !== undefined) user.is_public = is_public;
-  
-      if (current_password && new_password) {
-        const match = await bcrypt.compare(current_password, user.password);
-  
-        if (!match) {
-          return res.status(401).json({ error: "Actual password incorrect." });
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
         }
-  
-        const hashedPassword = await bcrypt.hash(new_password, 10);
-        user.password = hashedPassword;
-      }
-  
-      await user.save();
-  
-      return res.json({
-        message: "User updated with success.",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          height_cm: user.height_cm,
-          weight_kg: user.weight_kg,
-          is_public: user.is_public,
-        },
-      });
+
+        if (height_cm !== undefined) user.height_cm = height_cm;
+        if (weight_kg !== undefined) user.weight_kg = weight_kg;
+        if (email !== undefined && email !== user.email) {
+            user.email = email;
+        }
+        if (is_public !== undefined) user.is_public = is_public;
+
+        if (current_password && new_password) {
+            const match = await bcrypt.compare(current_password, user.password);
+
+            if (!match) {
+                return res.status(401).json({ error: "Actual password incorrect." });
+            }
+
+            const hashedPassword = await bcrypt.hash(new_password, 10);
+            user.password = hashedPassword;
+        }
+
+        await user.save();
+
+        return res.json({
+            message: "User updated with success.",
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                height_cm: user.height_cm,
+                weight_kg: user.weight_kg,
+                is_public: user.is_public,
+            },
+        });
     } catch (error) {
-      console.error("Error to update user:", error);
-      return res.status(500).json({ error: "Internal error to user." });
+        console.error("Error to update user:", error);
+        return res.status(500).json({ error: "Internal error to user." });
     }
-  };
-  
+};
+
 
 
 // DELETE / user
