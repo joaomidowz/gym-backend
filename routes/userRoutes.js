@@ -22,6 +22,7 @@ router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUse
 // PROTECTED ROUTES
 router.get('/', authMiddleware, userController.getAllUsers)
 router.put('/:id', authMiddleware, isUserOwnerOrAdmin, userController.updateUser)
+router.put('/:id/admin', authMiddleware, isUserOwnerOrAdmin, userController.updateAdmin)
 router.delete('/:id', authMiddleware, isUserOwnerOrAdmin, userController.deleteUser)
 
 module.exports = router;

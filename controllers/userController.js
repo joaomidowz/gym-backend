@@ -187,6 +187,48 @@ const updateUser = async (req, res) => {
 };
 
 
+const updateAdmin = async (req, res) => {
+    const { id } = req.params;
+    const {
+        is_admin,
+    } = req.body;
+
+    if (is_admin === undefined) {
+        return res.status(400).json({
+            error: "Field 'is_admin' is required and must be a boolean.",
+        });
+    }
+
+    try {
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        if (typeof is_admin !== "boolean") {
+            return res.status(400).json({
+                error: "Field 'is_admin' is required and must be a boolean.",
+            });
+        }
+
+        user.is_admin = is_admin;
+
+        await user.save();
+
+        return res.json({
+            message: "Admin status updated successfully.",
+            user: {
+                id: user.id,
+                name: user.name,
+                is_admin: user.is_admin,
+            },
+        });
+    } catch (error) {
+        console.error("Error to update user:", error);
+        return res.status(500).json({ error: "Internal error to user." });
+    }
+};
 
 // DELETE / user
 const deleteUser = async (req, res) => {
@@ -242,5 +284,6 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    searchUser
+    searchUser,
+    updateAdmin
 };
