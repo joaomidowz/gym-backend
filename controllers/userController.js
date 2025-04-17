@@ -119,6 +119,7 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { id } = req.params;
     const {
+        name,
         height_cm,
         weight_kg,
         email,
@@ -128,6 +129,7 @@ const updateUser = async (req, res) => {
     } = req.body;
 
     if (
+        name === undefined &&
         height_cm === undefined &&
         weight_kg === undefined &&
         email === undefined &&
@@ -148,6 +150,7 @@ const updateUser = async (req, res) => {
 
         if (height_cm !== undefined) user.height_cm = height_cm;
         if (weight_kg !== undefined) user.weight_kg = weight_kg;
+        if (name !== undefined) user.name = name;
         if (email !== undefined && email !== user.email) {
             user.email = email;
         }
