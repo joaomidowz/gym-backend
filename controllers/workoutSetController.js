@@ -1,4 +1,5 @@
 const { WorkoutSet, WorkoutExercise } = require('../models')
+const { checkAndSavePR } = require('./prController');
 
 const updateWorkoutExerciseSummary = async (workout_exercise_id) => {
   const sets = await WorkoutSet.findAll({ where: { workout_exercise_id } })
@@ -33,11 +34,21 @@ const createSet = async (req, res) => {
     const newSet = await WorkoutSet.create({
       workout_exercise_id: exerciseId,
       workout_session_id,
+      exercise_id: exercise.exercise_id,
       set_type,
       weight,
       reps,
       order,
-    })
+    });
+
+    await checkAndSavePR({
+      user_id: exercise.user_id,
+      workout_session_id,
+      exercise_id: exercise.exercise_id,
+      weight,
+      reps,
+    });
+
 
     await updateWorkoutExerciseSummary(exerciseId)
 
@@ -90,6 +101,15 @@ const updateSet = async (req, res) => {
     if (order !== undefined) set.order = order;
     if (done !== undefined) set.done = done;
 
+    await checkAndSavePR({
+      user_id: req.user.id,
+      workout_session_id: set.workout_session_id,
+      exercise_id: set.exercise_id,
+      weight: set.weight,
+      reps: set.reps,
+    });
+    
+
     await set.save();
     await updateWorkoutExerciseSummary(set.workout_exercise_id);
 
@@ -121,7 +141,7 @@ const deleteSet = async (req, res) => {
 module.exports = {
   createSet,
   getSetsByExercise,
-  getSetById, // opcional
+  getSetById,
   updateSet,
   deleteSet,
 }

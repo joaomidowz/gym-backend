@@ -1,19 +1,18 @@
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('workout_sets', {
+    await queryInterface.createTable('workout_prs', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      workout_exercise_id: {
+      user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'workout_exercises',
+          model: 'users',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -36,25 +35,13 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
-      set_type: {
-        type: Sequelize.ENUM('Warmup', 'Feeder', 'Work', 'Top'),
+      pr_type: {
+        type: Sequelize.ENUM('weight', 'reps'),
         allowNull: false,
       },
-      weight: {
+      value: {
         type: Sequelize.FLOAT,
-        allowNull: true,
-      },
-      reps: {
-        type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      order: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      done: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
       },
       createdAt: {
         allowNull: false,
@@ -70,6 +57,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('workout_sets');
-  },
+    await queryInterface.dropTable('workout_prs');
+  }
 };

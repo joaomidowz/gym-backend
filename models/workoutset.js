@@ -4,7 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class WorkoutSet extends Model {
     static associate(models) {
-      // Protege as associações com checagem
       if (models.WorkoutExercise) {
         WorkoutSet.belongsTo(models.WorkoutExercise, {
           foreignKey: 'workout_exercise_id',
@@ -18,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
           as: 'session',
         });
       }
+      if (models.Exercise) {
+        WorkoutSet.belongsTo(models.Exercise, {
+          foreignKey: 'exercise_id',
+          as: 'exercise',
+        });
+      }
     }
   }
 
@@ -27,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     workout_session_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    exercise_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -59,13 +68,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
-    },      
+    },
   }, {
     sequelize,
     modelName: 'WorkoutSet',
     tableName: 'workout_sets',
-    timestamps: true, // já vem com createdAt e updatedAt
+    timestamps: true,
   });
+
 
   return WorkoutSet;
 };
