@@ -73,6 +73,7 @@ const getPublicFeed = async (req, res) => {
         id: session.id,
         title: session.title,
         notes: session.notes,
+        duration_seconds: session.duration_seconds,
         createdAt: session.createdAt,
         user: {
           id: session.owner?.id,
