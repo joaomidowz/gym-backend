@@ -1,4 +1,4 @@
-const { Exercise } = require("../models");
+const { Exercise, WorkoutPR } = require("../models");
 const { Op } = require("sequelize");
 
 const VALID_MUSCLE_GROUPS = [
@@ -26,6 +26,47 @@ const getAllExercise = async (req, res) => {
     res.json(exercises);
   } catch (error) {
     console.error('Get exercises error: ', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getExercisesWithPR = async (req, res) => {
+  try {
+    const exercises = await Exercise.findAll({
+      where: {
+        [Op.or]: [
+          { is_global: true },
+          { user_id: req.user.id }
+        ]
+      },
+      raw: true,
+    });
+
+    const exerciseIds = exercises.map((ex) => ex.id);
+
+    const prs = await WorkoutPR.findAll({
+      where: {
+        user_id: req.user.id,
+        exercise_id: exerciseIds
+      },
+      attributes: ['exercise_id', 'pr_type', 'value'],
+      raw: true,
+    });
+
+    const prsByExercise = prs.reduce((acc, pr) => {
+      if (!acc[pr.exercise_id]) acc[pr.exercise_id] = {};
+      acc[pr.exercise_id][pr.pr_type === "weight" ? "pr_weight" : "pr_reps"] = pr.value;
+      return acc;
+    }, {});
+
+    const enriched = exercises.map((ex) => ({
+      ...ex,
+      ...(prsByExercise[ex.id] || {}),
+    }));
+
+    res.json(enriched);
+  } catch (error) {
+    console.error("Get exercises with PR error: ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -145,5 +186,6 @@ module.exports = {
   alterExercise,
   deleteExercise,
   searchExercise,
-  getExercisesAdmin
+  getExercisesAdmin,
+  getExercisesWithPR
 };

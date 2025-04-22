@@ -8,6 +8,7 @@ const { isAdmin } = require('../middlewares/ownershipMiddleware');
 
 // GET /exercises
 router.get('/', authMiddleware, exerciseController.getAllExercise)
+router.get('/with-pr', authMiddleware, exerciseController.getExercisesWithPR);
 router.get('/search', authMiddleware, exerciseController.searchExercise)
 router.get("/admin/exercises", authMiddleware, isAdmin, exerciseController.getExercisesAdmin);
 
