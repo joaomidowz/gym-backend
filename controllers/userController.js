@@ -1,5 +1,4 @@
-const { User } = require('../models');
-const { WorkoutSession } = require('../models');
+const { WorkoutSession, Sequelize, User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const secret = process.env.JWT_SECRET;
