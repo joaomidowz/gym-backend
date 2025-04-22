@@ -59,6 +59,7 @@ const getAllSessions = async function (req, res) {
                 notes: session.notes,
                 createdAt: session.createdAt,
                 user: session.owner,
+                duration_seconds: session.duration_seconds,
                 like_count: session.likes.length,
                 comments_count: session.comments.length,
                 total_sets: totalSets,

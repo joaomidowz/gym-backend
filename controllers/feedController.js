@@ -6,6 +6,7 @@ const {
   WorkoutExercise,
   WorkoutSet,
   Exercise,
+  WorkoutPR
 } = require('../models');
 
 const getPublicFeed = async (req, res) => {
@@ -22,7 +23,7 @@ const getPublicFeed = async (req, res) => {
           model: User,
           as: 'owner',
           attributes: ['id', 'name', 'is_public'],
-          where: { is_public: true }, 
+          where: { is_public: true },
         },
         {
           model: Like,
@@ -64,6 +65,26 @@ const getPublicFeed = async (req, res) => {
     });
     const likedSessionIds = likedSessions.map((like) => like.session_id);
 
+    const allSessionIds = sessions.map((s) => s.id);
+
+    const prs = await WorkoutPR.findAll({
+      where: {
+        workout_session_id: allSessionIds,
+      },
+      attributes: ['id', 'pr_type', 'value', 'exercise_id', 'workout_session_id'],
+    });
+
+    const prsBySession = prs.reduce((acc, pr) => {
+      if (!acc[pr.workout_session_id]) acc[pr.workout_session_id] = [];
+      acc[pr.workout_session_id].push({
+        pr_type: pr.pr_type,
+        value: pr.value,
+        exercise_id: pr.exercise_id,
+      });
+      return acc;
+    }, {});
+
+
     const formatted = sessions.map((session) => {
       const allSets = session.workout_exercises.flatMap((ex) => ex.workout_sets || []);
       const totalSets = allSets.length;
@@ -86,6 +107,7 @@ const getPublicFeed = async (req, res) => {
         total_weight: totalWeight,
         comments: session.comments,
         is_liked: likedSessionIds.includes(session.id),
+        prs: prsBySession[session.id] || [],
       };
     });
 
