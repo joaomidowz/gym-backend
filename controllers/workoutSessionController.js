@@ -64,6 +64,7 @@ const getAllSessions = async function (req, res) {
                 total_sets: totalSets,
                 total_weight: totalWeight,
                 comments: session.comments,
+                duration_seconds: session.duration_seconds,
             };
         });
 
@@ -77,12 +78,20 @@ const getAllSessions = async function (req, res) {
 
 // POST /workout-session
 const createSession = async (req, res) => {
-    const { date, is_public = true, title, notes } = req.body;
+    const { date, is_public = true, title, notes, duration_seconds = 0 } = req.body;
 
     if (!title || !date) return res.status(400).json({ error: 'title and date are required' });
 
     try {
-        const sessions = await WorkoutSession.create({ user_id: req.user.id, date, is_public, title, notes });
+        const sessions = await WorkoutSession.create({
+            user_id: req.user.id,
+            date,
+            is_public,
+            title,
+            notes,
+            duration_seconds,
+        });
+
         const updatedStreak = await updateUserStreak(req.user.id, date);
 
         res.status(201).json({
@@ -143,15 +152,17 @@ const getSessionById = async (req, res) => {
 // PUT /workout-session/:id
 const updateSession = async (req, res) => {
     const { id } = req.params;
-    const { title, date, is_public, notes } = req.body;
+    const { title, date, is_public, notes, duration_seconds } = req.body;
 
-    if (!title && !date && typeof is_public === 'undefined' && !notes)
-        return res.status(400).json({ error: 'At least one field (title, date, is_public, notes) must be provided' });
+    if (!title && !date && typeof is_public === 'undefined' && !notes && typeof duration_seconds === 'undefined') {
+        return res.status(400).json({ error: 'At least one field (title, date, is_public, notes, duration_seconds) must be provided' });
+    }
 
     try {
         const session = await WorkoutSession.findByPk(id);
         if (!session) return res.status(404).json({ error: 'Workout session not found' });
 
+        if (duration_seconds !== undefined) session.duration_seconds = duration_seconds;
         if (title !== undefined) session.title = title;
         if (date !== undefined) session.date = date;
         if (is_public !== undefined) session.is_public = is_public;

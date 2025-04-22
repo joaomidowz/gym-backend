@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       })
 
       WorkoutSession.hasMany(models.WorkoutExercise, {
-        foreignKey: 'workout_session_id', 
+        foreignKey: 'workout_session_id',
         as: 'workout_exercises'
       });
 
@@ -52,6 +52,11 @@ module.exports = (sequelize, DataTypes) => {
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false
+    },
+    duration_seconds: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     sequelize,

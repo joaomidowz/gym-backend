@@ -13,6 +13,11 @@ module.exports = {
       notes: { type: Sequelize.TEXT, allowNull: true },
       date: { type: Sequelize.DATEONLY, allowNull: false },
       is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
+      duration_seconds: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       user_id: {
         type: Sequelize.INTEGER,
         references: { model: 'users', key: 'id' },
