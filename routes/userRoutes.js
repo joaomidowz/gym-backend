@@ -18,6 +18,7 @@ router.get("/:id/streak", getUserStreakById);
 router.post('/streak/save', authMiddleware, useStreakSave);
 router.get('/search', authMiddleware, userController.searchUser)
 router.get('/:id', authMiddleware, checkProfileVisibility, userController.getUserById)
+router.get('/:id/training-days', authMiddleware, userController.getTrainingDays);
 
 // PROTECTED ROUTES
 router.get('/', authMiddleware, userController.getAllUsers)

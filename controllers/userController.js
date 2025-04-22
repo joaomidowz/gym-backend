@@ -274,6 +274,29 @@ const searchUser = async (req, res) => {
     }
 }
 
+// GET /user/:id/training-days
+const getTrainingDays = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const sessions = await WorkoutSession.findAll({
+            where: { user_id: id },
+            attributes: [[
+                Sequelize.fn('DATE', Sequelize.col('date')), 'date'
+            ]],
+            group: [Sequelize.fn('DATE', Sequelize.col('date'))],
+            order: [[Sequelize.fn('DATE', Sequelize.col('date')), 'ASC']],
+            raw: true
+        });
+
+        const days = sessions.map((s) => s.date).sort();
+        res.json(days);
+    } catch (error) {
+        console.error('Erro ao buscar dias de treino:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 
 module.exports = {
@@ -285,5 +308,6 @@ module.exports = {
     updateUser,
     deleteUser,
     searchUser,
-    updateAdmin
+    updateAdmin,
+    getTrainingDays
 };
