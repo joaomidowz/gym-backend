@@ -1,17 +1,16 @@
 # 🏋️ Gym App - Backend
 
-Este é o backend da aplicação **Gym App**, feita para gerenciar usuários, treinos, execuções, e agora também **ações sociais como curtidas, comentários, feed e seguidores**.  
-Ideal pra quem quer manter o foco nos treinos e ainda socializar com a galera da maromba digital 💪🔥
+Este é o backend oficial do **Gym App**, uma aplicação para gerenciamento de treinos com funcionalidades sociais como curtidas, comentários, feed e sistema de seguidores. Desenvolvido para motivar a galera da maromba a treinar pesado e interagir! 💪🔥
 
 ---
 
-## 🔧 Tecnologias utilizadas
+## 🔧 Tecnologias Utilizadas
 
 - Node.js + Express
 - Sequelize ORM
-- PostgreSQL (Railway ou local)
+- PostgreSQL (local ou Railway)
 - JWT + Bcrypt para autenticação segura
-- Sequelize CLI para migrations
+- Sequelize CLI para migrations e seeders
 - Dotenv para variáveis de ambiente
 
 ---
@@ -26,198 +25,154 @@ DB_HOST=
 DB_PORT=
 JWT_SECRET=
 ```
-## 🧠 Funcionalidades
-
-### 🔐 Autenticação
-- Registro e login com hash seguro (bcrypt)
-- JWT gerado e validado em cada rota protegida
-- Middleware `authMiddleware` ativo
-- Rota `GET /user/me` para pegar perfil logado
 
 ---
+
+## 🧐 Funcionalidades
+
+### 🔐 Autenticação
+- Registro e login de usuário com senha criptografada (bcrypt)
+- JWT emitido e validado em cada rota privada
+- Middleware `authMiddleware` implementado
 
 ### 👤 Usuários
 - CRUD completo com campos `is_admin` e `is_public`
-- Atualização e deleção protegida
-- Middleware `isUserOwnerOrAdmin` e verificação de perfil público
-
----
+- Atualização e exclusão protegidas
+- Middleware `isUserOwnerOrAdmin` para garantir propriedade
+- Middleware `checkProfileVisibility` para proteger perfis privados
 
 ### 🏋️ Exercícios
-- CRUD completo de exercícios
-- Campos `is_global` e `user_id`
-- Proteção: apenas o criador ou admin pode editar/deletar
-- Exercícios globais ou já usados não podem ser alterados
+- CRUD de exercícios
+- Campos `is_global`, `muscle_group`, `user_id`
+- Proteção contra edição/deleção de exercícios globais ou em uso
+- Middleware `isExerciseOwnerOrAdmin`, `isExerciseGlobal`, `isExerciseInUse`
 
----
+### 🗓️ Sessões de Treino (`WorkoutSession`)
+- Campos: `title`, `date`, `is_public`, `duration_seconds`, `notes`
+- CRUD completo vinculado a usuário
+- Proteção de propriedade com `isSessionOwnerOrAdmin` e visibilidade com `checkSessionVisibility`
 
-### 📅 Sessões de treino (`WorkoutSession`)
-- Campos: `title`, `date`, `is_public`
-- CRUD completo vinculado ao usuário
-- Proteção: somente dono ou admin pode editar/deletar
-- Middleware `isSessionOwnerOrAdmin` e `checkSessionVisibility`
-
----
-
-### 🏋️‍♀️ Execuções (`WorkoutExercise`)
-- Cada execução representa um exercício dentro de uma sessão
-- Campos: `exercise_id`, `weight`, `reps`, `sets`, `notes`
+### 🏋️‍♂️ Execuções de Exercício (`WorkoutExercise`)
+- Representa um exercício dentro da sessão
+- Campos: `exercise_id`, `name`
+- Atualiza automaticamente resumos (último peso, sets, reps)
 - Middleware `isWorkoutExerciseOwnerOrAdmin`
-- Resumo automático atualizado com base nos `WorkoutSet`
 
----
+### 🔄 Séries (`WorkoutSet`)
+- Cada set representa uma série de exercício
+- Campos: `set_type`, `weight`, `reps`, `order`, `done`
+- Proteção por `isSetOwnerOrAdmin`
 
-### 🔥 Sistema de Streak (Sequência de Treinos)
-- Rastreia automaticamente os dias consecutivos de treino
-- A streak é reiniciada se o usuário ficar mais de 2 dias sem treinar
-- Se quebrar, o usuário tem 24h para usar um "salve" e manter a streak
-- Rotas:
-  - `GET /user/streak`: visualiza a streak atual
-  - `POST /user/streak/save`: usa o salve se estiver disponível
+### 🔥 Streak de Treino (`UserStreak`)
+- Rastreia sequência de dias treinados
+- Sistema de "salvamento" para não perder streak
+- Middleware para gestão de saves e atualizações automáticas
 
----
-
-### 🔂 Séries (`WorkoutSet`)
-- Série individual (set) de um exercício
-- Campos: `set_type`, `weight`, `reps`, `order`
-- CRUD completo: criar, listar, atualizar e remover
-- Proteção com `isSetOwnerOrAdmin` (dono da sessão ou admin)
-- Atualiza automaticamente o resumo (`sets`, `reps`, `weight`) na `WorkoutExercise`
-
----
+### 🔋 PRs - Personal Records (`WorkoutPR`)
+- Registro automático dos melhores resultados de peso e reps
+- Vinculado ao usuário, exercício e sessão
 
 ### ❤️ Likes
-- `POST /likes` para curtir sessões públicas
-- `DELETE /likes/:id` para descurtir
-- Protegido: apenas o autor do like ou admin pode deletar
-
----
+- `POST /likes` para curtir sessão
+- `DELETE /likes` para descurtir
+- Protegido com middleware de autor/autenticado
 
 ### 💬 Comentários
-- `POST /comments` para comentar sessões públicas
-- `GET /comments/:sessionId` para listar todos os comentários
-- `DELETE /comments/:id` com middleware `isCommentOwner`
-
----
+- `POST /comments` para comentar em sessões
+- `GET /comments/:sessionId` para listar
+- `DELETE /comments/:id` para deletar (dono/admin)
 
 ### 📰 Feed Social
-- Rota `GET /feed`
-- Lista sessões públicas ordenadas por data (mais recentes primeiro)
-- Inclui:
-  - Dados do dono da sessão
-  - Total de likes
-  - Comentários (com autor)
-- Suporta paginação: `?limit=10&offset=0`
+- `GET /feed`
+- Lista sessões públicas recentes com curtidas e comentários
+- Paginado: `?limit=10&offset=0`
+
+### 👥 Seguidores
+- `POST /follow/:userId` para seguir
+- `DELETE /follow/:userId` para deixar de seguir
+- Listagem de followers/following
 
 ---
 
-### 👥 Seguidores
-- `POST /follow/:id` para seguir um usuário
-- `DELETE /follow/:id` para deixar de seguir
-- Middleware `isFollowOwner` protege as ações
-
-### 📁 Estrutura de Pastas
+## 📁 Estrutura de Pastas
 
 ```bash
 backend/
 ├── config/
 │   └── config.js
 ├── controllers/
-│   ├── commentController.js
-│   ├── exerciseController.js
-│   ├── followController.js
-│   ├── likeController.js
-│   ├── streakController.js      
-│   ├── userController.js
-│   ├── workoutExerciseController.js
-│   ├── workoutSessionController.js
-│   └── workoutSetController.js
-├── routes/
-│   ├── commentRoutes.js
-│   ├── exerciseRoutes.js
-│   ├── feedRoutes.js
-│   ├── followRoutes.js
-│   ├── likeRoutes.js
-│   ├── userRoutes.js             
-│   ├── workoutExerciseRoutes.js
-│   ├── workoutSessionRoutes.js
-│   └── workoutSetRoutes.js
 ├── middlewares/
-│   ├── authMiddleware.js
-│   ├── isCommentOwner.js
-│   ├── isFollowOwner.js
-│   ├── isLikeOwner.js
-│   ├── ownershipMiddleware.js
-│   ├── setMiddleware.js
-│   └── visibilityMiddleware.js
-├── migrations/ #
+├── migrations/
 ├── models/
-│   ├── Comment.js
-│   ├── Exercise.js
-│   ├── Follow.js
-│   ├── index.js
-│   ├── Like.js
-│   ├── User.js
-│   ├── UserStreak.js             
-│   ├── WorkoutExercise.js
-│   ├── WorkoutSession.js
-│   └── WorkoutSet.js
-├── utils/
-│   └── streakUtils.js            
+├── routes/
 ├── seeders/
-├── .env
-├── .gitignore
+├── utils/
 ├── index.js
 ├── package.json
+├── .env
 ├── README.md
-├── plano.md
-└── script.md
+└── plano.md
 ```
 
-## 🚀 Como rodar localmente
+**Destaques:**
+- `controllers/` - Toda lógica de negócio
+- `models/` - Models do Sequelize
+- `middlewares/` - Proteção de rotas e checagens
+- `routes/` - Organização de endpoints REST
+
+---
+
+## 🚀 Como Rodar Localmente
 
 ```bash
-# Clone o projeto
-git clone https://github.com/seu-usuario/gym-backend.git
+# Clone o repositório
+$ git clone https://github.com/seu-usuario/gym-backend.git
 
 # Acesse a pasta
-cd gym-backend
+$ cd gym-backend
 
 # Instale as dependências
-npm install
+$ npm install
 
-# Configure seu .env com os dados do banco
+# Configure o arquivo .env com seu banco
 
 # Rode as migrations
-npx sequelize-cli db:migrate
+$ npx sequelize-cli db:migrate
 
 # Inicie o servidor
-npx nodemon index.js
+$ npx nodemon index.js
+```
 
 ---
 
-## 🧱 Status do Backend
+## 🛠️ Status do Backend
 
-| Módulo                   | Status              |
-|--------------------------|---------------------|
-| Autenticação             | ✅ Pronto           |
-| Usuários                 | ✅ Pronto           |
-| Exercícios               | ✅ Pronto           |
-| Sessões                  | ✅ Pronto           |
-| Execuções                | ✅ Pronto           |
-| Séries                   | ✅ Finalizado       |
-| Comentários              | ✅ Pronto           |
-| Likes                    | ✅ Pronto           |
-| Streak                   | ✅ pronto           |
-| Feed                     | ✅ Pronto           |
-| Seguidores               | ✅ Pronto           |
-| Segurança e Middleware   | ✅ Ativo e testado  |
+| Módulo                   | Status            |
+|----------------------------|-------------------|
+| Autenticação             | ✅ Finalizado     |
+| Usuários                   | ✅ Finalizado     |
+| Exercícios                 | ✅ Finalizado     |
+| Sessões                   | ✅ Finalizado     |
+| Execuções de Exercício     | ✅ Finalizado     |
+| Sets                       | ✅ Finalizado     |
+| Streak                     | ✅ Finalizado     |
+| PRs                        | ✅ Finalizado     |
+| Comentários                | ✅ Finalizado     |
+| Likes                      | ✅ Finalizado     |
+| Feed Social                | ✅ Finalizado     |
+| Seguidores                 | ✅ Finalizado     |
 
 ---
 
-## 🧠 Próximos passos (ideias)
+## 🧪 Próximos Passos
 
-- 📊 Histórico de recordes (PRs)
-- 📈 Gráfico de progresso
-- 🔔 Notificações sociais (likes, follows, comentários)
-- 📲 Iniciar frontend (React Native, Next...)
+- 📊 Gráfico de Progresso do Usuário
+- 📲 Notificações Push para Likes/Comments/Follows
+- 💡 Sistema de Medalhas por Streak/PR
+- 👨‍💻 Painel Admin para gerenciamento de usuários
+- 📱 Versão Mobile (React Native)
+
+---
+
+🔥 Gym App: treino e motivação conectados!
+
